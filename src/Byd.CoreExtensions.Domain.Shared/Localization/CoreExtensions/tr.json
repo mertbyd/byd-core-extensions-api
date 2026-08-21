@@ -1,7 +1,8 @@
 {
   "culture": "tr",
   "texts": {
-    "MyAccount":  "Hesabım",
-    "SamplePageMessage": "CoreExtensions modulünden örnek bir sayfa"
+    "MyAccount": "Hesabım",
+    "SamplePageMessage": "CoreExtensions modülünden örnek bir sayfa",
+    "CoreExtensions.General:00001": "Bu kayıt başka kayıtlarla ilişkili olduğu için silinemez."
   }
 }

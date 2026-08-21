@@ -1,0 +1,11 @@
+{
+  "culture": "tr",
+  "texts": {
+    "22001": "Girdiğiniz değer izin verilen uzunluktan daha uzun.",
+    "23502": "Zorunlu bir alan boş bırakıldı.",
+    "23503": "Bu işlem ilişkili bir kayıtla çakışıyor.",
+    "23505": "Aynı değere sahip bir kayıt zaten var.",
+    "23514": "Girdiğiniz değer bir doğrulama kuralını sağlamıyor.",
+    "23P01": "Bu değer mevcut bir kayıtla çakışıyor."
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "culture": "en",
+  "texts": {
+    "22001": "The value you entered is longer than the allowed length.",
+    "23502": "A required field was left empty.",
+    "23503": "This operation conflicts with a related record.",
+    "23505": "A record with the same value already exists.",
+    "23514": "The value you entered does not satisfy a validation rule.",
+    "23P01": "This value overlaps with an existing record."
+  }
+}

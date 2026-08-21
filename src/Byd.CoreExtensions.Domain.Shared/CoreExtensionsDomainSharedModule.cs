@@ -21,15 +21,17 @@ public class CoreExtensionsDomainSharedModule : AbpModule
         {
             options.FileSets.AddEmbedded<CoreExtensionsDomainSharedModule>();
         });
-
         Configure<AbpLocalizationOptions>(options =>
         {
             options.Resources
                 .Add<CoreExtensionsResource>("en")
                 .AddBaseTypes(typeof(AbpValidationResource))
-                .AddVirtualJson("/Localization/CoreExtensions");
+                .AddVirtualJson(CoreExtensionsLocalizationConsts.VirtualPath);
+            // Postgres saglayici hatalari genel kaynaktan ayri tutulur; kendi sanal klasorunden beslenir.
+            options.Resources
+                .Add<CoreExtensionsPostgresExceptionsResource>("en")
+                .AddVirtualJson(CoreExtensionsLocalizationConsts.PostgresExceptions.VirtualPath);
         });
-
         Configure<AbpExceptionLocalizationOptions>(options =>
         {
             options.MapCodeNamespace("CoreExtensions", typeof(CoreExtensionsResource));
