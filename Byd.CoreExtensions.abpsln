@@ -1,0 +1,7 @@
+{
+  "modules": {
+    "Byd.CoreExtensions": {
+      "path": "Byd.CoreExtensions.abpmdl"
+    }
+  }
+}
