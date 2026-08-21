@@ -1,0 +1,21 @@
+<Solution>
+  <Folder Name="/host/">
+    <Project Path="host/Byd.CoreExtensions.Host.Shared/Byd.CoreExtensions.Host.Shared.csproj" />
+    <Project Path="host/Byd.CoreExtensions.HttpApi.Host/Byd.CoreExtensions.HttpApi.Host.csproj" />
+  </Folder>
+  <Folder Name="/src/">
+    <Project Path="src/Byd.CoreExtensions.Application.Contracts/Byd.CoreExtensions.Application.Contracts.csproj" />
+    <Project Path="src/Byd.CoreExtensions.Application/Byd.CoreExtensions.Application.csproj" />
+    <Project Path="src/Byd.CoreExtensions.Domain.Shared/Byd.CoreExtensions.Domain.Shared.csproj" />
+    <Project Path="src/Byd.CoreExtensions.Domain/Byd.CoreExtensions.Domain.csproj" />
+    <Project Path="src/Byd.CoreExtensions.EntityFrameworkCore/Byd.CoreExtensions.EntityFrameworkCore.csproj" />
+    <Project Path="src/Byd.CoreExtensions.HttpApi.Client/Byd.CoreExtensions.HttpApi.Client.csproj" />
+    <Project Path="src/Byd.CoreExtensions.HttpApi/Byd.CoreExtensions.HttpApi.csproj" />
+  </Folder>
+  <Folder Name="/test/">
+    <Project Path="test/Byd.CoreExtensions.Application.Tests/Byd.CoreExtensions.Application.Tests.csproj" />
+    <Project Path="test/Byd.CoreExtensions.Domain.Tests/Byd.CoreExtensions.Domain.Tests.csproj" />
+    <Project Path="test/Byd.CoreExtensions.EntityFrameworkCore.Tests/Byd.CoreExtensions.EntityFrameworkCore.Tests.csproj" />
+    <Project Path="test/Byd.CoreExtensions.TestBase/Byd.CoreExtensions.TestBase.csproj" />
+  </Folder>
+</Solution>

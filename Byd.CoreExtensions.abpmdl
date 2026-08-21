@@ -1,0 +1,63 @@
+{
+  "folders": {
+    "items": {
+      "src": {},
+      "test": {},
+      "host": {}
+    }
+  },
+  "packages": {
+    "Byd.CoreExtensions.Domain.Shared": {
+      "path": "src/Byd.CoreExtensions.Domain.Shared/Byd.CoreExtensions.Domain.Shared.abppkg",
+      "folder": "src"
+    },
+    "Byd.CoreExtensions.Domain": {
+      "path": "src/Byd.CoreExtensions.Domain/Byd.CoreExtensions.Domain.abppkg",
+      "folder": "src"
+    },
+    "Byd.CoreExtensions.Application.Contracts": {
+      "path": "src/Byd.CoreExtensions.Application.Contracts/Byd.CoreExtensions.Application.Contracts.abppkg",
+      "folder": "src"
+    },
+    "Byd.CoreExtensions.Application": {
+      "path": "src/Byd.CoreExtensions.Application/Byd.CoreExtensions.Application.abppkg",
+      "folder": "src"
+    },
+    "Byd.CoreExtensions.EntityFrameworkCore": {
+      "path": "src/Byd.CoreExtensions.EntityFrameworkCore/Byd.CoreExtensions.EntityFrameworkCore.abppkg",
+      "folder": "src"
+    },
+    "Byd.CoreExtensions.HttpApi": {
+      "path": "src/Byd.CoreExtensions.HttpApi/Byd.CoreExtensions.HttpApi.abppkg",
+      "folder": "src"
+    },
+    "Byd.CoreExtensions.HttpApi.Client": {
+      "path": "src/Byd.CoreExtensions.HttpApi.Client/Byd.CoreExtensions.HttpApi.Client.abppkg",
+      "folder": "src"
+    },
+    "Byd.CoreExtensions.TestBase": {
+      "path": "test/Byd.CoreExtensions.TestBase/Byd.CoreExtensions.TestBase.abppkg",
+      "folder": "test"
+    },
+    "Byd.CoreExtensions.EntityFrameworkCore.Tests": {
+      "path": "test/Byd.CoreExtensions.EntityFrameworkCore.Tests/Byd.CoreExtensions.EntityFrameworkCore.Tests.abppkg",
+      "folder": "test"
+    },
+    "Byd.CoreExtensions.Domain.Tests": {
+      "path": "test/Byd.CoreExtensions.Domain.Tests/Byd.CoreExtensions.Domain.Tests.abppkg",
+      "folder": "test"
+    },
+    "Byd.CoreExtensions.Application.Tests": {
+      "path": "test/Byd.CoreExtensions.Application.Tests/Byd.CoreExtensions.Application.Tests.abppkg",
+      "folder": "test"
+    },
+    "Byd.CoreExtensions.HttpApi.Host": {
+      "path": "host/Byd.CoreExtensions.HttpApi.Host/Byd.CoreExtensions.HttpApi.Host.abppkg",
+      "folder": "host"
+    },
+    "Byd.CoreExtensions.Host.Shared": {
+      "path": "host/Byd.CoreExtensions.Host.Shared/Byd.CoreExtensions.Host.Shared.abppkg",
+      "folder": "host"
+    }
+  }
+}
