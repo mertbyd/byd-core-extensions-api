@@ -1,7 +1,8 @@
 {
   "culture": "en",
   "texts": {
-    "MyAccount":  "My account",
-    "SamplePageMessage": "A sample page for the CoreExtensions module"
+    "MyAccount": "My account",
+    "SamplePageMessage": "A sample page for the CoreExtensions module",
+    "CoreExtensions.General:00001": "This record cannot be deleted because other records depend on it."
   }
 }

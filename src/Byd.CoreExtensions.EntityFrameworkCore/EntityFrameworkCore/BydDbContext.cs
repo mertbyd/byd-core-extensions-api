@@ -5,9 +5,7 @@ using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Byd.CoreExtensions.Interfaces;
 using Volo.Abp.EntityFrameworkCore;
-
 namespace Byd.CoreExtensions.EntityFrameworkCore;
-
 /// <summary>
 /// IHasIsActive uygulayan entity'lere global aktiflik filtresi ekleyen DbContext temeli.
 /// </summary>
@@ -19,12 +17,10 @@ public abstract class BydDbContext<TDbContext> : AbpDbContext<TDbContext>
     // Aktiflik filtresinin o anki durumunu ABP veri filtresi altyapisindan okur.
     protected virtual bool IsIsActiveFilterEnabled
         => DataFilter?.IsEnabled<IHasIsActive>() ?? false;
-
     protected BydDbContext(DbContextOptions<TDbContext> options)
         : base(options)
     {
     }
-
     // Entity IHasIsActive tasiyorsa global filtreye dahil eder, aksi halde ABP'nin kararini korur.
     protected override bool ShouldFilterEntity<TEntity>(IMutableEntityType entityType)
     {
@@ -32,17 +28,14 @@ public abstract class BydDbContext<TDbContext> : AbpDbContext<TDbContext>
         {
             return true;
         }
-
         return base.ShouldFilterEntity<TEntity>(entityType);
     }
-
     // ABP'nin mevcut filtre ifadesine aktiflik kosulunu ekler; bayrak ifadenin icinde tutuldugu icin filtre calisma aninda acilip kapanabilir.
     protected override Expression<Func<TEntity, bool>>? CreateFilterExpression<TEntity>(
         ModelBuilder modelBuilder,
         EntityTypeBuilder<TEntity> entityTypeBuilder)
     {
         var expression = base.CreateFilterExpression<TEntity>(modelBuilder, entityTypeBuilder);
-
         if (!typeof(IHasIsActive).IsAssignableFrom(typeof(TEntity)))
         {
             return expression;
