@@ -1,4 +1,5 @@
-﻿using Volo.Abp.Modularity;
+﻿using Byd.CoreExtensions.Consts;
+using Volo.Abp.Modularity;
 using Volo.Abp.Localization;
 using Byd.CoreExtensions.Localization;
 using Volo.Abp.Domain;
@@ -24,17 +25,17 @@ public class CoreExtensionsDomainSharedModule : AbpModule
         Configure<AbpLocalizationOptions>(options =>
         {
             options.Resources
-                .Add<CoreExtensionsResource>("en")
+                .Add<CoreExtensionsResource>(CoreExtensionsLocalizationConsts.DefaultCulture)
                 .AddBaseTypes(typeof(AbpValidationResource))
                 .AddVirtualJson(CoreExtensionsLocalizationConsts.VirtualPath);
             // Postgres saglayici hatalari genel kaynaktan ayri tutulur; kendi sanal klasorunden beslenir.
             options.Resources
-                .Add<CoreExtensionsPostgresExceptionsResource>("en")
+                .Add<CoreExtensionsPostgresExceptionsResource>(CoreExtensionsLocalizationConsts.DefaultCulture)
                 .AddVirtualJson(CoreExtensionsLocalizationConsts.PostgresExceptions.VirtualPath);
         });
         Configure<AbpExceptionLocalizationOptions>(options =>
         {
-            options.MapCodeNamespace("CoreExtensions", typeof(CoreExtensionsResource));
+            options.MapCodeNamespace(ExceptionCodeConsts.RootNamespace, typeof(CoreExtensionsResource));
         });
     }
 }

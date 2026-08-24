@@ -1,4 +1,4 @@
-namespace Byd.CoreExtensions.Localization;
+﻿namespace Byd.CoreExtensions.Localization;
 
 /// <summary>
 /// Modulun localization kaynak adlarini ve sanal klasor yollarini tasiyan sabit sahibi.
@@ -7,6 +7,9 @@ namespace Byd.CoreExtensions.Localization;
 // sistemdeki gorevi: Ozniteliklerin, modul kaydinin ve saglayicilarin ayni dizgeyi tekrar yazmasini engeller; ad degisirse tek dosya guncellenir.
 public static class CoreExtensionsLocalizationConsts
 {
+    // Kaynaklarin kayit edildigi varsayilan kultur.
+    public const string DefaultCulture = "en";
+
     // Modulun genel localization kaynaginin adi.
     public const string ResourceName = "CoreExtensions";
 
