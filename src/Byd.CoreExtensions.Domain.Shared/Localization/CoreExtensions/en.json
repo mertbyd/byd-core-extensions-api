@@ -7,6 +7,10 @@
     "CoreExtensions.General:00002": "The requested filter operator is not supported.",
     "CoreExtensions.General:00003": "The filter value cannot be converted to the target data type.",
     "CoreExtensions.General:00004": "Page number must be 1 or greater.",
-    "CoreExtensions.General:00005": "Page size must be between 1 and 1000."
+    "CoreExtensions.General:00005": "Page size must be between 1 and 1000.",
+    "CoreExtensions.General:00006": "The requested record was not found.",
+    "CoreExtensions.General:00007": "A record with the same values already exists.",
+    "CoreExtensions.General:00008": "A required value was not provided.",
+    "CoreExtensions.General:00009": "The provided value is not a valid option."
   }
 }

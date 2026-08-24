@@ -7,6 +7,10 @@
     "CoreExtensions.General:00002": "İstenen filtre operatörü desteklenmiyor.",
     "CoreExtensions.General:00003": "Filtre değeri hedef veri tipine dönüştürülemedi.",
     "CoreExtensions.General:00004": "Sayfa numarası 1 veya daha büyük olmalıdır.",
-    "CoreExtensions.General:00005": "Sayfa boyutu 1 ile 1000 arasında olmalıdır."
+    "CoreExtensions.General:00005": "Sayfa boyutu 1 ile 1000 arasında olmalıdır.",
+    "CoreExtensions.General:00006": "İstenen kayıt bulunamadı.",
+    "CoreExtensions.General:00007": "Aynı değerlere sahip bir kayıt zaten mevcut.",
+    "CoreExtensions.General:00008": "Zorunlu bir alan boş bırakıldı.",
+    "CoreExtensions.General:00009": "Gönderilen değer geçerli bir seçenek değil."
   }
 }
