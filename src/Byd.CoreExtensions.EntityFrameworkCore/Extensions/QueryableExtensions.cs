@@ -91,9 +91,26 @@ public static class QueryableExtensions
         int page,
         int pageSize)
     {
-        var skip = Math.Max(0, (page - 1) * pageSize);
+        if (page < DataTablePaging.FirstPage)
+        {
+            throw new BusinessException(GeneralExceptionCodes.InvalidPage)
+                .WithData("page", page);
+        }
 
-        return query.Skip(skip).Take(pageSize);
+        if (pageSize < 1 || pageSize > DataTablePaging.MaxPageSize)
+        {
+            throw new BusinessException(GeneralExceptionCodes.InvalidPageSize)
+                .WithData("pageSize", pageSize);
+        }
+
+        var skipValue = ((long)page - DataTablePaging.FirstPage) * pageSize;
+        if (skipValue > int.MaxValue)
+        {
+            throw new BusinessException(GeneralExceptionCodes.InvalidPage)
+                .WithData("page", page);
+        }
+
+        return query.Skip((int)skipValue).Take(pageSize);
     }
 
     // Filtre modeli tipinin izin listesini cikarir; sonucu tip basina cache'ler.
@@ -137,6 +154,10 @@ public static class QueryableExtensions
                 BuildBetween(member, item, parseType),
             DataTableFilterOperator.In =>
                 BuildIn(member, item.Values, parseType),
+            DataTableFilterOperator.IsNull =>
+                BuildNullComparison(member, equalsNull: true),
+            DataTableFilterOperator.IsNotNull =>
+                BuildNullComparison(member, equalsNull: false),
             _ => throw new BusinessException(GeneralExceptionCodes.UnsupportedFilterOperator)
                 .WithData("operator", item.Operator!)
         };
@@ -154,9 +175,18 @@ public static class QueryableExtensions
     // Metin alaninda gecme kosulunu kurar.
     private static Expression BuildContains(Expression member, string? value)
     {
-        var method = typeof(string).GetMethod(nameof(string.Contains), new[] { typeof(string) })!;
+        if (member.Type != typeof(string))
+        {
+            throw new BusinessException(GeneralExceptionCodes.UnsupportedFilterOperator)
+                .WithData("operator", DataTableFilterOperator.Contains)
+                .WithData("targetType", member.Type.FullName ?? member.Type.Name);
+        }
 
-        return Expression.Call(member, method, Expression.Constant(value ?? string.Empty));
+        var method = typeof(string).GetMethod(nameof(string.Contains), new[] { typeof(string) })!;
+        var isNotNull = Expression.NotEqual(member, Expression.Constant(null, typeof(string)));
+        var contains = Expression.Call(member, method, Expression.Constant(value ?? string.Empty));
+
+        return Expression.AndAlso(isNotNull, contains);
     }
 
     // Verilen degerlerden birine esitlik kosulunu kurar.
@@ -177,6 +207,18 @@ public static class QueryableExtensions
             .MakeGenericMethod(member.Type);
 
         return Expression.Call(contains, Expression.Constant(list, listType), member);
+    }
+
+    // Nullable veya referans tipli alan icin null esitligi/esitsizligi kurar.
+    private static Expression BuildNullComparison(Expression member, bool equalsNull)
+    {
+        if (member.Type.IsValueType && Nullable.GetUnderlyingType(member.Type) == null)
+        {
+            return Expression.Constant(!equalsNull);
+        }
+
+        var comparison = Expression.Equal(member, Expression.Constant(null, member.Type));
+        return equalsNull ? comparison : Expression.Not(comparison);
     }
 
     // Noktali property yolunu entity parametresi uzerinde uye erisim zincirine cevirir.
@@ -207,27 +249,85 @@ public static class QueryableExtensions
         var text = raw ?? string.Empty;
         var underlying = Nullable.GetUnderlyingType(targetType) ?? targetType;
 
-        if (underlying.IsEnum)
+        try
         {
-            return Enum.Parse(underlying, text, ignoreCase: true);
-        }
+            if (underlying.IsEnum)
+            {
+                return Enum.Parse(underlying, text, ignoreCase: true);
+            }
 
-        if (underlying == typeof(Guid))
+            if (underlying == typeof(Guid))
+            {
+                return Guid.Parse(text);
+            }
+
+            if (underlying == typeof(DateTime))
+            {
+                return DateTime.Parse(
+                    text,
+                    CultureInfo.InvariantCulture,
+                    DateTimeStyles.AssumeUniversal | DateTimeStyles.AdjustToUniversal);
+            }
+
+            if (underlying == typeof(DateTimeOffset))
+            {
+                return DateTimeOffset.Parse(
+                    text,
+                    CultureInfo.InvariantCulture,
+                    DateTimeStyles.AssumeUniversal | DateTimeStyles.AdjustToUniversal);
+            }
+
+            if (underlying == typeof(DateOnly))
+            {
+                return DateOnly.Parse(text, CultureInfo.InvariantCulture);
+            }
+
+            if (underlying == typeof(TimeOnly))
+            {
+                return TimeOnly.Parse(text, CultureInfo.InvariantCulture);
+            }
+
+            if (underlying == typeof(TimeSpan))
+            {
+                return TimeSpan.Parse(text, CultureInfo.InvariantCulture);
+            }
+
+            if (underlying == typeof(byte[]))
+            {
+                return Convert.FromBase64String(text);
+            }
+
+            return Convert.ChangeType(text, underlying, CultureInfo.InvariantCulture);
+        }
+        catch (FormatException exception)
         {
-            return Guid.Parse(text);
+            throw CreateInvalidFilterValueException(text, underlying, exception);
         }
-
-        if (underlying == typeof(DateTime))
+        catch (InvalidCastException exception)
         {
-            return DateTime.Parse(text, CultureInfo.InvariantCulture, DateTimeStyles.AdjustToUniversal);
+            throw CreateInvalidFilterValueException(text, underlying, exception);
         }
-
-        if (underlying == typeof(DateTimeOffset))
+        catch (OverflowException exception)
         {
-            return DateTimeOffset.Parse(text, CultureInfo.InvariantCulture);
+            throw CreateInvalidFilterValueException(text, underlying, exception);
         }
+        catch (ArgumentException exception)
+        {
+            throw CreateInvalidFilterValueException(text, underlying, exception);
+        }
+    }
 
-        return Convert.ChangeType(text, underlying, CultureInfo.InvariantCulture);
+    // Beklenen donusum hatasini kararli ve lokalize edilebilir BusinessException'a cevirir.
+    private static BusinessException CreateInvalidFilterValueException(
+        string value,
+        Type targetType,
+        Exception innerException)
+    {
+        return new BusinessException(
+                GeneralExceptionCodes.InvalidFilterValue,
+                innerException: innerException)
+            .WithData("value", value)
+            .WithData("targetType", targetType.FullName ?? targetType.Name);
     }
 
     // Tek bir siralama adimini OrderBy/ThenBy olarak dinamik uye tipiyle uygular.

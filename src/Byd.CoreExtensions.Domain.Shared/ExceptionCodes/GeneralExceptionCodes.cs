@@ -16,4 +16,13 @@ public static class GeneralExceptionCodes
 
     // Filtre isteginde taninmayan operator belirteci gonderildi.
     public const string UnsupportedFilterOperator = Prefix + ":00002";
+
+    // Filtre degeri hedef CLR tipine donusturulemedi.
+    public const string InvalidFilterValue = Prefix + ":00003";
+
+    // Sayfa numarasi desteklenen araligin disinda gonderildi.
+    public const string InvalidPage = Prefix + ":00004";
+
+    // Sayfa boyutu desteklenen araligin disinda gonderildi.
+    public const string InvalidPageSize = Prefix + ":00005";
 }
