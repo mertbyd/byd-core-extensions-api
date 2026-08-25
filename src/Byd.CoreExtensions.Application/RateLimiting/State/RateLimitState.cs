@@ -8,7 +8,7 @@ namespace Byd.CoreExtensions.RateLimiting;
 /// </summary>
 // islevi: Guncel snapshot'i tutar; ayar degistiginde yeni versiyonlu snapshot ile atomik olarak degistirir.
 // sistemdeki gorevi: Dinamik rate limit'in kalbi; limiter factory bu durumu kilitlemeden okur, ayar okuyucu ise Update ile tazeler.
-public class RateLimitState : ISingletonDependency
+public class RateLimitState : IRateLimitState, ISingletonDependency
 {
     private volatile RateLimitSnapshot _current = new(
         RateLimitConsts.DefaultAlgorithm,

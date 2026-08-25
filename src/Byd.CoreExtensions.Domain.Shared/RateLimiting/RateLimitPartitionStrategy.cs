@@ -8,20 +8,20 @@ namespace Byd.CoreExtensions.RateLimiting;
 public static class RateLimitPartitionStrategy
 {
     // Istemci IP adresi; anonim istekler icin varsayilan.
-    public const string Ip = "ip"; //TODO BİLİYORUM
+    public const string Ip = "ip";
 
     // Kimlik dogrulanmis kullanici (UserId).
-    public const string User = "user"; //TODO BİLİYORUM
+    public const string User = "user";
 
     // SaaS kiracisi (TenantId).
-    public const string Tenant = "tenant";//TODO BİLİYORUM
+    public const string Tenant = "tenant";
 
     // Harici API tuketicisi (ClientId / API anahtari).
-    public const string Client = "client";//TODO BİLMİYORUM
+    public const string Client = "client";
 
     // Kullanici ve endpoint bilesimi; endpoint basina ayri sayac.
-    public const string UserAndEndpoint = "userAndEndpoint";//TODO BİLMİYORUM
+    public const string UserAndEndpoint = "userAndEndpoint";
 
     // Tenant ve kullanici bilesimi; kiracinin ic kullanicisi bazinda sayac.
-    public const string TenantAndUser = "tenantAndUser";//TODO BİLMİYORUM
+    public const string TenantAndUser = "tenantAndUser";
 }

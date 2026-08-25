@@ -5,7 +5,7 @@ namespace Byd.CoreExtensions.RateLimiting;
 /// </summary>
 // islevi: Aktif algoritma, istek limiti, pencere ve versiyon degerlerini degismez tek nesnede tasir.
 // sistemdeki gorevi: Limiter factory'nin senkron okudugu durum sozlesmesi; versiyon degistikce partition anahtari degisir ve taze limiter kurulur.
-public class RateLimitSnapshot
+public sealed class RateLimitSnapshot
 {
     public RateLimitSnapshot(string algorithm, int permitLimit, int windowSeconds, long version)
     {
