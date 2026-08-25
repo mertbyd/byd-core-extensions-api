@@ -15,4 +15,8 @@
     <ProjectReference Include="..\Byd.CoreExtensions.Domain\Byd.CoreExtensions.Domain.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
 </Project>

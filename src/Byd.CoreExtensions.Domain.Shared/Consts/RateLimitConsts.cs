@@ -23,4 +23,13 @@ public static class RateLimitConsts
 
     // SlidingWindow'da oznitelik dilim sayisi atmadiginda kullanilan sabit dilim sayisi.
     public const int DefaultSegmentsPerWindow = 6;
+
+    // Global rate limit policy'sinin adi; convention bu adla policy'yi endpoint'lere baglar.
+    public const string PolicyName = "CoreExtensions.RateLimit";
+
+    // Partition anahtari parcalarini ayiran ayirac.
+    public const string PartitionKeySeparator = ":";
+
+    // Kimlik ve IP bulunamadiginda kullanilan partition kimligi.
+    public const string UnknownPartitionKey = "unknown";
 }

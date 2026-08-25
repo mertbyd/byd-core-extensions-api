@@ -57,6 +57,7 @@ public class CoreExtensionsHttpApiHostModule : AbpModule
         {
             options.SwaggerEndpoint("/swagger/v1/swagger.json", "CoreExtensions API");
         });
+        app.UseRateLimiter();
         app.UseConfiguredEndpoints();
         return Task.CompletedTask;
     }
