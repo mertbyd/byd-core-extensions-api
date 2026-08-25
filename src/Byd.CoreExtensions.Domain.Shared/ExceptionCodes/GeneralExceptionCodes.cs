@@ -25,4 +25,16 @@ public static class GeneralExceptionCodes
 
     // Sayfa boyutu desteklenen araligin disinda gonderildi.
     public const string InvalidPageSize = Prefix + ":00005";
+
+    // Predicate ile aranan kayit veritabaninda bulunamadi.
+    public const string EntityNotFound = Prefix + ":00006";
+
+    // Ayni degerlere sahip bir kayit zaten var oldugu icin islem yapilamadi.
+    public const string AlreadyExists = Prefix + ":00007";
+
+    // Zorunlu bir alan bos birakildi.
+    public const string RequiredValueMissing = Prefix + ":00008";
+
+    // Enum alanina tanimli olmayan bir deger gonderildi.
+    public const string InvalidEnumValue = Prefix + ":00009";
 }
