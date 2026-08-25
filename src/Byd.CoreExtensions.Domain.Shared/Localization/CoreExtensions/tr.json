@@ -11,6 +11,7 @@
     "CoreExtensions.General:00006": "İstenen kayıt bulunamadı.",
     "CoreExtensions.General:00007": "Aynı değerlere sahip bir kayıt zaten mevcut.",
     "CoreExtensions.General:00008": "Zorunlu bir alan boş bırakıldı.",
-    "CoreExtensions.General:00009": "Gönderilen değer geçerli bir seçenek değil."
+    "CoreExtensions.General:00009": "Gönderilen değer geçerli bir seçenek değil.",
+    "CoreExtensions.General:00010": "Çok fazla istek gönderildi. Lütfen daha sonra tekrar deneyin."
   }
 }

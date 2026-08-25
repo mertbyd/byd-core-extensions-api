@@ -37,4 +37,7 @@ public static class GeneralExceptionCodes
 
     // Enum alanina tanimli olmayan bir deger gonderildi.
     public const string InvalidEnumValue = Prefix + ":00009";
+
+    // Rate limit asildi; istemci pencere/kota dolduktan sonra yeniden denemelidir.
+    public const string TooManyRequests = Prefix + ":00010";
 }

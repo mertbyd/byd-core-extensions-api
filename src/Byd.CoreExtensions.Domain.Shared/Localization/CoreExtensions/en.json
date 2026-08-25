@@ -11,6 +11,7 @@
     "CoreExtensions.General:00006": "The requested record was not found.",
     "CoreExtensions.General:00007": "A record with the same values already exists.",
     "CoreExtensions.General:00008": "A required value was not provided.",
-    "CoreExtensions.General:00009": "The provided value is not a valid option."
+    "CoreExtensions.General:00009": "The provided value is not a valid option.",
+    "CoreExtensions.General:00010": "Too many requests. Please try again later."
   }
 }
