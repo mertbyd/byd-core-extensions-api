@@ -33,4 +33,10 @@ public static class DataTableFilterOperator
 
     // Values listesindeki degerlerden herhangi birine esitlik; Values'i kullanan tek operator.
     public const string In = "in";
+
+    // Nullable veya referans tipli alanda deger bulunmamasini denetler.
+    public const string IsNull = "isNull";
+
+    // Nullable veya referans tipli alanda deger bulunmasini denetler.
+    public const string IsNotNull = "isNotNull";
 }

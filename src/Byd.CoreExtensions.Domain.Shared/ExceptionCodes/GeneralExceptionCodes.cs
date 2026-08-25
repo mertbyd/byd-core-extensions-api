@@ -1,3 +1,5 @@
+﻿using Byd.CoreExtensions.Consts;
+
 namespace Byd.CoreExtensions.ExceptionCodes;
 
 /// <summary>
@@ -8,7 +10,19 @@ namespace Byd.CoreExtensions.ExceptionCodes;
 public static class GeneralExceptionCodes
 {
     // Tum genel kodlarin ortak on eki; gramer "<Modul>.<Konu>:<sira>" seklindedir.
-    public const string Prefix = "CoreExtensions.General";
+    public const string Prefix = ExceptionCodeConsts.RootNamespace + ".General";
     // Baska kayitlarla iliskili oldugu icin silinemeyen veri.
     public const string RelationalDataDelete = Prefix + ":00001";
+
+    // Filtre isteginde taninmayan operator belirteci gonderildi.
+    public const string UnsupportedFilterOperator = Prefix + ":00002";
+
+    // Filtre degeri hedef CLR tipine donusturulemedi.
+    public const string InvalidFilterValue = Prefix + ":00003";
+
+    // Sayfa numarasi desteklenen araligin disinda gonderildi.
+    public const string InvalidPage = Prefix + ":00004";
+
+    // Sayfa boyutu desteklenen araligin disinda gonderildi.
+    public const string InvalidPageSize = Prefix + ":00005";
 }

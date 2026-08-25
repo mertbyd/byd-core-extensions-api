@@ -3,6 +3,10 @@
   "texts": {
     "MyAccount": "My account",
     "SamplePageMessage": "A sample page for the CoreExtensions module",
-    "CoreExtensions.General:00001": "This record cannot be deleted because other records depend on it."
+    "CoreExtensions.General:00001": "This record cannot be deleted because other records depend on it.",
+    "CoreExtensions.General:00002": "The requested filter operator is not supported.",
+    "CoreExtensions.General:00003": "The filter value cannot be converted to the target data type.",
+    "CoreExtensions.General:00004": "Page number must be 1 or greater.",
+    "CoreExtensions.General:00005": "Page size must be between 1 and 1000."
   }
 }

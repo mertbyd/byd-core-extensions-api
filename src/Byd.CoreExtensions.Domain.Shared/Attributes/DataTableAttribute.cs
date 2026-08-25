@@ -1,6 +1,6 @@
 using System;
 
-namespace Byd.CoreExtensions.Querying;
+namespace Byd.CoreExtensions.Attributes;
 
 /// <summary>
 /// Filtre modeli property'sini entity alanina ve hedef tipe baglayan oznitelik.
