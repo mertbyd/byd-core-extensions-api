@@ -3,6 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi;
 using Byd.CoreExtensions.EntityFrameworkCore;
+using Byd.CoreExtensions.Extensions;
 using System.Threading.Tasks;
 using Volo.Abp;
 using Volo.Abp.AspNetCore.Mvc;
@@ -25,6 +26,12 @@ namespace Byd.CoreExtensions;
 // sistemdeki gorevi: Core yetenekleri eklenmeden once API, Swagger ve middleware omurgasini calistirir.
 public class CoreExtensionsHttpApiHostModule : AbpModule
 {
+    // ABP tablolarinin sema ve on ekini EF modeli kurulmadan once cozer.
+    public override void PreConfigureServices(ServiceConfigurationContext context)
+    {
+        ServiceConfigurationContextExtension.ResolveSchemaAndPrefix();
+    }
+
     // Temel Swagger dokumanini ve cakismasiz schema kimliklerini kaydeder.
     public override void ConfigureServices(ServiceConfigurationContext context)
     {
