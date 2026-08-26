@@ -47,55 +47,14 @@ public sealed class RateLimitPolicy : IRateLimiterPolicy<string>
         // Policy singleton olarak etkinlestirilir; scoped ABP kimlik servislerini resolver request scope'undan alir.
         var resolver = context.RequestServices.GetRequiredService<RateLimitPartitionResolver>();
         var snapshot = _state.Current;
-        var algorithm = ResolveAlgorithm(rule, snapshot);
         var permitLimit = ResolvePermitLimit(rule, snapshot);
         var windowSeconds = ResolveWindowSeconds(rule, snapshot);
         var queueLimit = rule?.QueueLimit ?? RateLimitConsts.DefaultQueueLimit;
-        var segmentsPerWindow = ResolveSegmentsPerWindow(rule);
-        var tokensPerPeriod = ResolveTokensPerPeriod(rule, permitLimit);
         return RateLimitPartitionFactory.Create(
-            algorithm,
-            BuildPartitionKey(
-                resolver.Resolve(context, rule),
-                algorithm,
                 permitLimit,
                 windowSeconds,
                 queueLimit,
-                segmentsPerWindow,
-                tokensPerPeriod,
-                snapshot.Version),
-            permitLimit,
-            windowSeconds,
-            queueLimit,
-            segmentsPerWindow,
-            tokensPerPeriod);
     }
-
-    // Partition anahtarini kimlik, cozulmus kural imzasi ve snapshot versiyonundan kurar.
-    // Limiter'lar anahtar basina onbelleklenir; imza olmadan ayni kimlikle vurulan farkli kurallar
-    // ilk endpointin limiter'ini paylasir ve kendi oznitelik degerlerini kaybeder.
-    private static string BuildPartitionKey(
-        string identity,
-        string algorithm,
-        int permitLimit,
-        int windowSeconds,
-        int queueLimit,
-        int segmentsPerWindow,
-        int tokensPerPeriod,
-        long version)
-    {
-        return string.Join(
-            RateLimitConsts.PartitionKeySeparator,
-            identity,
-            algorithm,
-            permitLimit.ToString(CultureInfo.InvariantCulture),
-            windowSeconds.ToString(CultureInfo.InvariantCulture),
-            queueLimit.ToString(CultureInfo.InvariantCulture),
-            segmentsPerWindow.ToString(CultureInfo.InvariantCulture),
-            tokensPerPeriod.ToString(CultureInfo.InvariantCulture),
-            version.ToString(CultureInfo.InvariantCulture));
-    }
-
     // Oznitelik algoritma belirtmediyse snapshot'taki global algoritmayi kullanir.
     private static string ResolveAlgorithm(RateLimitAttribute? rule, RateLimitSnapshot snapshot)
     {
