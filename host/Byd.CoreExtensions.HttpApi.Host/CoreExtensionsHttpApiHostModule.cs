@@ -1,9 +1,13 @@
+using System;
+using System.IO;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi;
+using Byd.CoreExtensions.Consts;
 using Byd.CoreExtensions.EntityFrameworkCore;
 using Byd.CoreExtensions.Extensions;
+using Swashbuckle.AspNetCore.SwaggerGen;
 using System.Threading.Tasks;
 using Volo.Abp;
 using Volo.Abp.AspNetCore.Mvc;
@@ -32,20 +36,40 @@ public class CoreExtensionsHttpApiHostModule : AbpModule
         ServiceConfigurationContextExtension.ResolveSchemaAndPrefix();
     }
 
-    // Temel Swagger dokumanini ve cakismasiz schema kimliklerini kaydeder.
+    // Temel Swagger dokumanini, cakismasiz schema kimliklerini ve XML aciklamalarini kaydeder.
     public override void ConfigureServices(ServiceConfigurationContext context)
     {
         context.Services.AddAbpSwaggerGen(options =>
         {
             options.SwaggerDoc(
-                "v1",
+                SwaggerConsts.DocumentName,
                 new OpenApiInfo
                 {
-                    Title = "CoreExtensions API",
-                    Version = "v1"
+                    Title = SwaggerConsts.DocumentTitle,
+                    Version = SwaggerConsts.DocumentName
                 });
             options.CustomSchemaIds(type => type.FullName);
+            IncludeXmlDocumentation(options);
         });
+    }
+
+    // Controller ve DTO XML yorumlarini Swagger dokumanina tasir; dosya uretilmediyse sessizce atlanir.
+    private static void IncludeXmlDocumentation(SwaggerGenOptions options)
+    {
+        var fileNames = new[]
+        {
+            SwaggerConsts.HttpApiXmlDocumentationFileName,
+            SwaggerConsts.ApplicationContractsXmlDocumentationFileName
+        };
+
+        foreach (var fileName in fileNames)
+        {
+            var path = Path.Combine(AppContext.BaseDirectory, fileName);
+            if (File.Exists(path))
+            {
+                options.IncludeXmlComments(path, includeControllerXmlComments: true);
+            }
+        }
     }
 
     // HTTP middleware zincirini API ve Swagger endpointleriyle baslatir.
@@ -62,7 +86,7 @@ public class CoreExtensionsHttpApiHostModule : AbpModule
         app.UseSwagger();
         app.UseAbpSwaggerUI(options =>
         {
-            options.SwaggerEndpoint("/swagger/v1/swagger.json", "CoreExtensions API");
+            options.SwaggerEndpoint(SwaggerConsts.DocumentUrl, SwaggerConsts.DocumentTitle);
         });
         app.UseRateLimiter();
         app.UseConfiguredEndpoints();
