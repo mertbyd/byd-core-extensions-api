@@ -3,6 +3,7 @@ using Volo.Abp.Data;
 using Byd.CoreExtensions.Entities.RateLimit;
 using Volo.Abp.EntityFrameworkCore;
 using Volo.Abp.SettingManagement.EntityFrameworkCore;
+using Byd.CoreExtensions.Entities;
 
 namespace Byd.CoreExtensions.EntityFrameworkCore;
 
@@ -12,6 +13,8 @@ public class CoreExtensionsDbContext : AbpDbContext<CoreExtensionsDbContext>, IC
     /* Add DbSet for each Aggregate Root here. Example:
      * public DbSet<Question> Questions { get; set; }
      */
+
+    public DbSet<ApiKey> ApiKeys { get; set; } = default!;
 
     public DbSet<ModuleSetting> ModuleSettings { get; set; } = default!;
 
