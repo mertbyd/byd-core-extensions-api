@@ -1,37 +1,47 @@
 using System.Threading.Tasks;
 using Byd.CoreExtensions.Consts;
-using Byd.CoreExtensions.Settings;
+using Byd.CoreExtensions.Interfaces;
 using Volo.Abp.DependencyInjection;
-using Volo.Abp.Settings;
 
 namespace Byd.CoreExtensions.RateLimiting;
 
 /// <summary>
 /// Rate limit ayarlarini asenkron okuyup bellek durumunu tazeler.
 /// </summary>
-// islevi: Uc dinamik ayari ISettingProvider ile okur ve RateLimitState.Update ile yeni versiyonlu snapshot'a yazar.
-// sistemdeki gorevi: Ayar okuma isini limiter policy'nin disinda tutar; cagrildiginda hazir snapshot'i atomik olarak yeniler.
+// islevi: Bu modulun tablo satirini repository ile okur ve RateLimitState.Update ile yeni versiyonlu snapshot'a yazar.
+// sistemdeki gorevi: ModuleSetting okumasini limiter policy'nin disinda tutar; snapshot ile sonraki yenileme TTL'ini birlikte tazeler.
 public class RateLimitStateRefresher : ITransientDependency
 {
-    private readonly ISettingProvider _settingProvider;
+    private readonly IModuleSettingRepository _repository;
     private readonly RateLimitState _state;
-
-    public RateLimitStateRefresher(ISettingProvider settingProvider, RateLimitState state)
+    public RateLimitStateRefresher(
+        IModuleSettingRepository repository,
+        RateLimitState state)
     {
-        _settingProvider = settingProvider;
+        _repository = repository;
         _state = state;
     }
+    // Son okunan satirin worker tarafindan kullanilacak yenileme suresini tasir.
+    public int LastTtlSeconds { get; private set; } = ModuleSettingConsts.DefaultTtlSeconds;
 
-    // Ayarlari asenkron okur ve snapshot'i yeni versiyonla tazeler; okunamayan deger sabit varsayilana duser.
+    // Modul satirini asenkron okur; satir yoksa rate limit'i kapali sabit varsayilanlara dondurur.
     public async Task RefreshAsync()
     {
-        var algorithm = await _settingProvider.GetOrNullAsync(CoreExtensionsSettings.RateLimitDefaultAlgorithm);
-        var permitLimit = await _settingProvider.GetAsync<int>(
-            CoreExtensionsSettings.RateLimitDefaultPermitLimit,
-            RateLimitConsts.DefaultPermitLimit);
-        var windowSeconds = await _settingProvider.GetAsync<int>(
-            CoreExtensionsSettings.RateLimitDefaultWindowSeconds,
-            RateLimitConsts.DefaultWindowSeconds);
-        _state.Update(algorithm ?? RateLimitConsts.DefaultAlgorithm, permitLimit, windowSeconds);
+        var moduleSetting = await _repository.FindAsync(
+            setting => setting.ModuleName == ModuleSettingConsts.CurrentModuleName);
+        if (moduleSetting is null)
+        {
+            LastTtlSeconds = ModuleSettingConsts.DefaultTtlSeconds;
+            _state.Update(
+                isEnabled: false,
+                RateLimitConsts.DefaultPermitLimit,
+                RateLimitConsts.DefaultWindowSeconds);
+            return;
+        }
+        LastTtlSeconds = moduleSetting.TtlSeconds;
+        _state.Update(
+            moduleSetting.RateLimitEnabled,
+            moduleSetting.RateLimitPermitLimit,
+            moduleSetting.RateLimitWindowSeconds);
     }
 }

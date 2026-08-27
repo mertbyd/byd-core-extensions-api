@@ -32,4 +32,7 @@ public static class RateLimitConsts
 
     // Kimlik ve IP bulunamadiginda kullanilan partition kimligi.
     public const string UnknownPartitionKey = "unknown";
+
+    // Modul rate limit'i kapaliyken kullanilan limitsiz partition kimligi.
+    public const string NoLimiterPartitionKey = "core-extensions-rate-limit-disabled";
 }

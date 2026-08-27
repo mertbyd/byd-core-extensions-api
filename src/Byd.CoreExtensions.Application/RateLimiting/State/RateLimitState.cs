@@ -11,17 +11,22 @@ namespace Byd.CoreExtensions.RateLimiting;
 public class RateLimitState : IRateLimitState, ISingletonDependency
 {
     private volatile RateLimitSnapshot _current = new(
+        isEnabled: false,
         RateLimitConsts.DefaultAlgorithm,
         RateLimitConsts.DefaultPermitLimit,
         RateLimitConsts.DefaultWindowSeconds,
         version: 0);
-
     // Limiter factory'nin her istekte senkron okudugu guncel snapshot.
     public RateLimitSnapshot Current => _current;
 
     // Yeni ayar degerlerini bir sonraki versiyonla snapshot'a yazar; okuma tarafi kilitlenmez.
-    public void Update(string algorithm, int permitLimit, int windowSeconds)
+    public void Update(bool isEnabled, int permitLimit, int windowSeconds)
     {
-        _current = new RateLimitSnapshot(algorithm, permitLimit, windowSeconds, _current.Version + 1);
+        _current = new RateLimitSnapshot(
+            isEnabled,
+            RateLimitConsts.DefaultAlgorithm,
+            permitLimit,
+            windowSeconds,
+            _current.Version + 1);
     }
 }

@@ -37,17 +37,20 @@ public sealed class RateLimitPolicy : IRateLimiterPolicy<string>
         _localizer = localizer;
         _serializer = serializer;
     }
-
     public Func<OnRejectedContext, CancellationToken, ValueTask>? OnRejected => WriteRejectionAsync;
 
     // Endpoint kuralini ve guncel snapshot'i okuyup istege uygun partition limiter'ini kurar.
     public RateLimitPartition<string> GetPartition(HttpContext context)
     {
+        var snapshot = _state.Current;
+        if (!snapshot.IsEnabled)
+        {
+            return RateLimitPartition.GetNoLimiter(RateLimitConsts.NoLimiterPartitionKey);
+        }
         var rule = context.GetEndpoint()?.Metadata.GetMetadata<RateLimitAttribute>();
         // Policy singleton olarak etkinlestirilir; scoped ABP kimlik servislerini resolver request scope'undan alir.
         var resolver = context.RequestServices.GetRequiredService<RateLimitPartitionResolver>();
-        var snapshot = _state.Current;
-        var algorithm = ResolveAlgorithm(rule, snapshot);
+        var algorithm = ResolveAlgorithm(rule);
         var permitLimit = ResolvePermitLimit(rule, snapshot);
         var windowSeconds = ResolveWindowSeconds(rule, snapshot);
         var queueLimit = rule?.QueueLimit ?? RateLimitConsts.DefaultQueueLimit;
@@ -70,7 +73,6 @@ public sealed class RateLimitPolicy : IRateLimiterPolicy<string>
             segmentsPerWindow,
             tokensPerPeriod);
     }
-
     // Partition anahtarini kimlik, cozulmus kural imzasi ve snapshot versiyonundan kurar.
     // Limiter'lar anahtar basina onbelleklenir; imza olmadan ayni kimlikle vurulan farkli kurallar
     // ilk endpointin limiter'ini paylasir ve kendi oznitelik degerlerini kaybeder.
@@ -95,11 +97,12 @@ public sealed class RateLimitPolicy : IRateLimiterPolicy<string>
             tokensPerPeriod.ToString(CultureInfo.InvariantCulture),
             version.ToString(CultureInfo.InvariantCulture));
     }
-
-    // Oznitelik algoritma belirtmediyse snapshot'taki global algoritmayi kullanir.
-    private static string ResolveAlgorithm(RateLimitAttribute? rule, RateLimitSnapshot snapshot)
+    // Oznitelik algoritma belirtmediyse sabit global algoritmayi kullanir.
+    private static string ResolveAlgorithm(RateLimitAttribute? rule)
     {
-        return string.IsNullOrEmpty(rule?.Algorithm) ? snapshot.Algorithm : rule.Algorithm;
+        return string.IsNullOrEmpty(rule?.Algorithm)
+            ? RateLimitConsts.DefaultAlgorithm
+            : rule.Algorithm;
     }
     // Oznitelik limit belirtmediyse snapshot'taki global limiti kullanir.
     private static int ResolvePermitLimit(RateLimitAttribute? rule, RateLimitSnapshot snapshot)
@@ -125,7 +128,6 @@ public sealed class RateLimitPolicy : IRateLimiterPolicy<string>
     {
         return rule is { TokensPerPeriod: > 0 } ? rule.TokensPerPeriod : permitLimit;
     }
-
     // 429 durum kodunu, Retry-After basligini ve ABP hata govdesini yazar.
     private async ValueTask WriteRejectionAsync(
         OnRejectedContext context,
@@ -134,10 +136,8 @@ public sealed class RateLimitPolicy : IRateLimiterPolicy<string>
         var response = context.HttpContext.Response;
         response.StatusCode = StatusCodes.Status429TooManyRequests;
         if (context.Lease.TryGetMetadata(MetadataName.RetryAfter, out var retryAfter))
-        {
             response.Headers.RetryAfter = ((int)retryAfter.TotalSeconds)
                 .ToString(CultureInfo.InvariantCulture);
-        }
         var body = new RemoteServiceErrorResponse(new RemoteServiceErrorInfo(
             _localizer[GeneralExceptionCodes.TooManyRequests],
             code: GeneralExceptionCodes.TooManyRequests));

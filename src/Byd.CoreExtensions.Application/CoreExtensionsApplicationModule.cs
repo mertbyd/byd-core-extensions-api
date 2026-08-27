@@ -6,9 +6,7 @@ using Volo.Abp.Application;
 using Volo.Abp.Mapperly;
 using Volo.Abp.Modularity;
 using Volo.Abp.Uow;
-
 namespace Byd.CoreExtensions;
-
 [DependsOn(
     typeof(CoreExtensionsDomainModule),
     typeof(CoreExtensionsApplicationContractsModule),
