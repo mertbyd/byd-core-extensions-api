@@ -10,7 +10,10 @@ public static class CoreExtensionsDbContextModelCreatingExtensions
     {
         Check.NotNull(builder, nameof(builder));
 
-        builder.ApplyConfiguration(new ModuleSettingConfiguration());
+        // Bu assembly'deki tum IEntityTypeConfiguration siniflarini tarayip uygular;
+        // yeni bir konfigurasyon eklendiginde burada elle kayit gerekmez.
+        builder.ApplyConfigurationsFromAssembly(
+            typeof(CoreExtensionsDbContextModelCreatingExtensions).Assembly);
 
         /* Configure all entities here. Example:
 
