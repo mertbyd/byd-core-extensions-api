@@ -10,6 +10,8 @@ public static class CoreExtensionsDbContextModelCreatingExtensions
     {
         Check.NotNull(builder, nameof(builder));
 
+        builder.ApplyConfiguration(new ModuleSettingConfiguration());
+
         /* Configure all entities here. Example:
 
         builder.Entity<Question>(b =>
