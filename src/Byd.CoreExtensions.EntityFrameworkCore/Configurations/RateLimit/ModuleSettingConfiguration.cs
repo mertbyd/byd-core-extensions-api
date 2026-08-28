@@ -18,7 +18,7 @@ public sealed class ModuleSettingConfiguration : IEntityTypeConfiguration<Module
     {
         builder.ToTable(
             CoreExtensionsDbProperties.DbTablePrefix + ModuleSettingConsts.TableName,
-            DatabaseConsts.RateLimitSchema);
+            CoreExtensionsDbProperties.DbSchema);
         builder.ConfigureByConvention();
         builder.Property(entity => entity.ModuleName)
             .IsRequired()

@@ -3,14 +3,14 @@ namespace Byd.CoreExtensions.Consts;
 /// <summary>
 /// Modulun veritabani sema adlarini tanimlar.
 /// </summary>
-// islevi: Modulun kullandigi tum sema adlarini derleme guvenli tek sabit kumesinde tutar.
-// sistemdeki gorevi: Modul bir ana uygulamaya baglandiginda hicbir tablo varsayilan public semasini
-// kirletmesin diye sema adlarinin tek kaynagidir; sema cozumu, EF konfigurasyonu ve migration ayni sabitleri okur.
+// islevi: Modulun kendi tablolarinin ve ayri tutulan framework tablolarinin sema adlarini derleme guvenli tek sabit kumesinde tutar.
+// sistemdeki gorevi: Sema adlarinin tek kaynagidir; CoreExtensionsDbProperties.DbSchema, EF konfigurasyonlari ve
+// migration'lar ayni sabitleri okur. Modul bir ana uygulamaya baglandiginda hicbir tablo varsayilan public semasini kirletmez.
 public static class DatabaseConsts
 {
+    // Modulun kendi tablolarinin tamaminin yazildigi sema.
+    public const string ModuleSchema = "ccore_extension";
+
     // ABP framework tablolarinin (ayar, izin, denetim vb.) yazildigi sema.
     public const string AbpSchema = "abp";
-
-    // Modulun rate limit yapilandirma tablolarinin yazildigi sema.
-    public const string RateLimitSchema = "ratelimit";
 }
