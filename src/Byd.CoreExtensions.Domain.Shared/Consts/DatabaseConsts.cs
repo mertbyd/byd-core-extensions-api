@@ -9,7 +9,7 @@ namespace Byd.CoreExtensions.Consts;
 public static class DatabaseConsts
 {
     // Modulun kendi tablolarinin tamaminin yazildigi sema.
-    public const string ModuleSchema = "ccore_extension";
+    public const string ModuleSchema = "core_extension";
 
     // ABP framework tablolarinin (ayar, izin, denetim vb.) yazildigi sema.
     public const string AbpSchema = "abp";
