@@ -21,4 +21,8 @@ public static class ApiKeyConsts
 
     // Uretilen anahtarin ham entropi boyutu (bayt); base64url kodlamasi sonrasi 43 karaktere karsilik gelir.
     public const int GeneratedKeyByteLength = 32;
+
+    // Bellekteki anahtar goruntusunun tazelik suresi (saniye). Sure dolunca sonraki dogrulama
+    // tabloyu bastan okur; silinen veya suresi degistirilen anahtarlar bu surede sisteme yansir.
+    public const int CacheTtlSeconds = 60;
 }

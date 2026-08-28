@@ -1,49 +1,49 @@
-using System;
-using System.Collections.Concurrent;
 using System.Threading;
 using System.Threading.Tasks;
+using Byd.CoreExtensions.Consts;
 using Byd.CoreExtensions.ExceptionCodes;
 using Byd.CoreExtensions.Interfaces;
-using Byd.CoreExtensions.Mappers.ApiKeys;
 using Volo.Abp.DependencyInjection;
 using Volo.Abp.Timing;
 
 namespace Byd.CoreExtensions.ApiKeys;
 
 /// <summary>
-/// Gelen API anahtarini dogrular ve cozulmus anahtarlari surec omru boyunca bellekte tutar.
+/// Gelen API anahtarini bellekteki guncel goruntuye karsi dogrular.
 /// </summary>
-// islevi: Anahtari once bellekteki sozlukte arar; bulamazsa repository'den tek kayit okur, bellege alir ve son kullanma kontrolunu yapar.
-// sistemdeki gorevi: Anahtar dogrulamasinin tek okuma noktasi. Tablonun tamami hic yuklenmez; bellek yalnizca gercekten kullanilan anahtarlar kadar buyur.
+// islevi: Goruntunun tazeligini kontrol eder, gerekiyorsa tabloyu bastan okutur, ardindan anahtari arar ve son kullanma kontrolunu yapar.
+// sistemdeki gorevi: Anahtar dogrulamasinin tek okuma noktasi. Goruntu tum anahtarlari tasidigi icin bilinmeyen anahtar denemesi veritabanina hic gitmez; goruntu TTL ile yenilendigi icin silinen veya suresi degistirilen anahtar en gec TTL kadar sonra dusunulur.
+// mirastan gelen: yok - dogrulama akisinin sahibi oldugu icin taban sinif kullanilmaz.
+// burada yazilan: ValidateAsync, GetFreshSnapshotAsync, IsExpired
 public class ApiKeyStore : IApiKeyStore, ITransientDependency
 {
-    // Cozulmus anahtar goruntuleri. Statiktir: durum servis ornegine degil surece aittir, boylece
-    // istekler arasinda yasar. Yalnizca veritabaninda bulunan anahtarlar yazilir; bilinmeyen anahtar
-    // yazilmaz, aksi halde rastgele anahtar denemeleri sozlugu sinirsiz sisirebilirdi.
-    // Bellek surece ozeldir ve surec omru boyunca yasar; anahtar guncelleme/silme endpointi
-    // bulunmadigi icin cozulmus goruntuyu dusuren bir yol da yoktur.
-    private static readonly ConcurrentDictionary<string, ApiKeyDescriptor> ResolvedApiKeys =
-        new(StringComparer.Ordinal);
+    // Tazeleme kilidi statiktir: tazelik durumu servis ornegine degil surece aittir. TTL doldugunda
+    // yalnizca tek bir istek tabloyu okur, es zamanli gelen digerleri tazelenmis sonucu bekler.
+    private static readonly SemaphoreSlim RefreshGate = new(1, 1);
 
-    private static readonly ApiKeyMapper Mapper = new();
-
-    private readonly IApiKeyRepository _apiKeyRepository;
+    private readonly IApiKeyState _state;
+    private readonly ApiKeyStateRefresher _refresher;
     private readonly IClock _clock;
 
-    public ApiKeyStore(IApiKeyRepository apiKeyRepository, IClock clock)
+    public ApiKeyStore(
+        IApiKeyState state,
+        ApiKeyStateRefresher refresher,
+        IClock clock)
     {
-        _apiKeyRepository = apiKeyRepository;
+        _state = state;
+        _refresher = refresher;
         _clock = clock;
     }
 
-    // Gelen anahtari cozer ve dogrular; ilk saglanmayan kosulun hata kodunu doner.
+    // Gelen anahtari dogrular; ilk saglanmayan kosulun hata kodunu doner.
     public async Task<ApiKeyValidationResult> ValidateAsync(
         string? key,
         CancellationToken cancellationToken = default)
     {
         if (string.IsNullOrWhiteSpace(key))
             return ApiKeyValidationResult.Fail(ApiKeyExceptionCodes.MissingApiKey);
-        var apiKey = await ResolveAsync(key, cancellationToken);
+        var snapshot = await GetFreshSnapshotAsync(cancellationToken);
+        var apiKey = snapshot.Find(key);
         if (apiKey is null)
             return ApiKeyValidationResult.Fail(ApiKeyExceptionCodes.InvalidApiKey);
         if (apiKey.ExpiresAt is not null && apiKey.ExpiresAt.Value <= _clock.Now)
@@ -51,16 +51,29 @@ public class ApiKeyStore : IApiKeyStore, ITransientDependency
         return ApiKeyValidationResult.Success(apiKey);
     }
 
-    // Anahtari once bellekte arar; yoksa repository'den tekil okumayla getirip bellege alir.
-    private async Task<ApiKeyDescriptor?> ResolveAsync(string key, CancellationToken cancellationToken)
+    // Goruntu tazeyse dogrudan doner; TTL dolduysa kilidi alan tek istek tabloyu yeniden yukler.
+    // Kilit alindiktan sonra tazelik yeniden kontrol edilir; boylece beklerken baskasi yuklediyse
+    // tablo ikinci kez okunmaz.
+    private async Task<ApiKeySnapshot> GetFreshSnapshotAsync(CancellationToken cancellationToken)
     {
-        if (ResolvedApiKeys.TryGetValue(key, out var resolved))
-            return resolved;
-        var entity = await _apiKeyRepository.FindByKeyAsync(key, cancellationToken);
-        if (entity is null)
-            return null;
-        var descriptor = Mapper.MapDescriptor(entity);
-        ResolvedApiKeys[key] = descriptor;
-        return descriptor;
+        if (!IsExpired(_state.Current))
+            return _state.Current;
+        await RefreshGate.WaitAsync(cancellationToken);
+        try
+        {
+            if (IsExpired(_state.Current))
+                await _refresher.RefreshAsync(cancellationToken);
+            return _state.Current;
+        }
+        finally
+        {
+            RefreshGate.Release();
+        }
+    }
+
+    // Goruntunun yuklenme zamaninin uzerinden TTL suresinin gecip gecmedigini bildirir.
+    private bool IsExpired(ApiKeySnapshot snapshot)
+    {
+        return snapshot.LoadedAt.AddSeconds(ApiKeyConsts.CacheTtlSeconds) <= _clock.Now;
     }
 }

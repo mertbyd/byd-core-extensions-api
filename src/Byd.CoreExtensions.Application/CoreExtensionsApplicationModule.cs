@@ -17,7 +17,7 @@ namespace Byd.CoreExtensions;
     typeof(AbpMapperlyModule)
     )]
 // islevi: Application katmaninin ABP modul kompozisyonunu ve servis kayitlarini kurar.
-// sistemdeki gorevi: Mapperly esleyicisini, rate limit ve API anahtari korumasini kaydeder; baslangicta yalnizca ilk rate limit snapshot'ini yukler.
+// sistemdeki gorevi: Mapperly esleyicisini, rate limit ve API anahtari korumasini kaydeder; baslangicta rate limit ve API anahtari snapshot'larini yukler.
 public class CoreExtensionsApplicationModule : AbpModule
 {
     // Rate limit motorunu, API anahtari dogrulamasini ve Mapperly esleyicisini servis koleksiyonuna kaydeder.
@@ -28,14 +28,16 @@ public class CoreExtensionsApplicationModule : AbpModule
         context.Services.AddMapperlyObjectMapper<CoreExtensionsApplicationModule>();
     }
 
-    // Baslangicta rate limit ayarlarini okuyup bellege yukler.
-    // API anahtarlari burada yuklenmez; ApiKeyStore her anahtari ilk kullanildiginda tek tek cozer.
+    // Baslangicta rate limit ayarlarini ve tum API anahtarlarini okuyup bellege yukler.
+    // Ilk yukleme basarisiz olsa bile sistem calisir: her iki goruntu de bayat sayilir ve
+    // ilk istekte kendini tazeler.
     public override async Task OnApplicationInitializationAsync(ApplicationInitializationContext context)
     {
         using var scope = context.ServiceProvider.CreateScope();
         var unitOfWorkManager = scope.ServiceProvider.GetRequiredService<IUnitOfWorkManager>();
         using var unitOfWork = unitOfWorkManager.Begin();
         await scope.ServiceProvider.GetRequiredService<RateLimitStateRefresher>().RefreshAsync();
+        await scope.ServiceProvider.GetRequiredService<ApiKeyStateRefresher>().RefreshAsync();
         await unitOfWork.CompleteAsync();
     }
 }
