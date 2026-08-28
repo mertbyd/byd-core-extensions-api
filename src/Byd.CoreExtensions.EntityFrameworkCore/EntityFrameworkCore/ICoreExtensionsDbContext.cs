@@ -1,6 +1,7 @@
 ﻿using Volo.Abp.Data;
 using Volo.Abp.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Byd.CoreExtensions.Entities;
 using Byd.CoreExtensions.Entities.RateLimit;
 
 namespace Byd.CoreExtensions.EntityFrameworkCore;
@@ -12,4 +13,6 @@ public interface ICoreExtensionsDbContext : IEfCoreDbContext
      * DbSet<Question> Questions { get; }
      */
     DbSet<ModuleSetting> ModuleSettings { get; }
+
+    DbSet<ApiKey> ApiKeys { get; }
 }
