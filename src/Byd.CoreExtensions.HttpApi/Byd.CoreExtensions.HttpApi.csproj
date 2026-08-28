@@ -6,9 +6,11 @@
     <TargetFramework>net10.0</TargetFramework>
     <Nullable>enable</Nullable>
     <RootNamespace>Byd.CoreExtensions</RootNamespace>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="SystemStandards.Core" Version="2.0.0" />
     <PackageReference Include="Volo.Abp.AspNetCore.Mvc" Version="10.3.0" />
     <ProjectReference Include="..\Byd.CoreExtensions.Application.Contracts\Byd.CoreExtensions.Application.Contracts.csproj" />
   </ItemGroup>
