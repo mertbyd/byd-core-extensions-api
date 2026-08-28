@@ -18,6 +18,11 @@
     "CoreExtensions.ModuleSetting:00003": "Aynı modül adına sahip bir modül ayarı zaten mevcut.",
     "CoreExtensions.ModuleSetting:00004": "TTL saniyesi 1 ile 86400 arasında olmalıdır.",
     "CoreExtensions.ModuleSetting:00005": "Rate limit izin sınırı 1 ile 1000000 arasında olmalıdır.",
-    "CoreExtensions.ModuleSetting:00006": "Rate limit pencere saniyesi 1 ile 86400 arasında olmalıdır."
+    "CoreExtensions.ModuleSetting:00006": "Rate limit pencere saniyesi 1 ile 86400 arasında olmalıdır.",
+    "CoreExtensions.ApiKey:00001": "Bu uç nokta için API anahtarı gereklidir.",
+    "CoreExtensions.ApiKey:00002": "Gönderilen API anahtarı geçersiz.",
+    "CoreExtensions.ApiKey:00004": "Gönderilen API anahtarının süresi dolmuş.",
+    "CoreExtensions.ApiKey:00005": "API anahtari adi zorunludur.",
+    "CoreExtensions.ApiKey:00006": "API anahtari adi 128 karakterden uzun olamaz."
   }
 }

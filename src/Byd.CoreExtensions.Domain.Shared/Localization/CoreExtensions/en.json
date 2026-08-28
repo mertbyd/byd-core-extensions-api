@@ -18,6 +18,11 @@
     "CoreExtensions.ModuleSetting:00003": "A module setting with the same module name already exists.",
     "CoreExtensions.ModuleSetting:00004": "TTL seconds must be between 1 and 86400.",
     "CoreExtensions.ModuleSetting:00005": "Rate limit permit limit must be between 1 and 1000000.",
-    "CoreExtensions.ModuleSetting:00006": "Rate limit window seconds must be between 1 and 86400."
+    "CoreExtensions.ModuleSetting:00006": "Rate limit window seconds must be between 1 and 86400.",
+    "CoreExtensions.ApiKey:00001": "An API key is required for this endpoint.",
+    "CoreExtensions.ApiKey:00002": "The provided API key is invalid.",
+    "CoreExtensions.ApiKey:00004": "The provided API key has expired.",
+    "CoreExtensions.ApiKey:00005": "API key name is required.",
+    "CoreExtensions.ApiKey:00006": "API key name cannot exceed 128 characters."
   }
 }
