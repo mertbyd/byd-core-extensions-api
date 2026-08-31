@@ -10,7 +10,7 @@ namespace Byd.CoreExtensions.Managers;
 /// <summary>
 /// Modul ayari olusturma, guncelleme, normalizasyon ve benzersizlik kurallarini yonetir.
 /// </summary>
-// islevi: ModuleName alanini kanoniklestirir, tekilligi dogrular ve data-shell entity mutasyonunu yapar.
+// islevi: ModuleName alanini kanoniklestirir, kapsam basina tekilligi dogrular ve data-shell entity mutasyonunu yapar.
 // sistemdeki gorevi: AppService'i is kararindan ve entity'yi davranistan uzak tutan domain sahibidir.
 public class ModuleSettingManager : BaseManager<ModuleSetting, Guid>
 {
@@ -35,8 +35,10 @@ public class ModuleSettingManager : BaseManager<ModuleSetting, Guid>
     {
         ArgumentNullException.ThrowIfNull(model);
         var moduleName = NormalizeRequiredText(model.ModuleName);
+        // Tekillik kapsam basinadir: ayni modul adi host satiri ve her tenant icin birer kez bulunabilir.
+        var tenantId = model.TenantId;
         await CheckAlreadyExistsAsync(
-            entity => entity.ModuleName == moduleName,
+            entity => entity.ModuleName == moduleName && entity.TenantId == tenantId,
             cancellationToken);
         var entity = new ModuleSetting(GuidGenerator.Create());
         Apply(entity, model, moduleName);
@@ -52,8 +54,9 @@ public class ModuleSettingManager : BaseManager<ModuleSetting, Guid>
         ArgumentNullException.ThrowIfNull(entity);
         ArgumentNullException.ThrowIfNull(model);
         var moduleName = NormalizeRequiredText(model.ModuleName);
+        var tenantId = model.TenantId;
         await CheckAlreadyExistsAsync(
-            candidate => candidate.ModuleName == moduleName,
+            candidate => candidate.ModuleName == moduleName && candidate.TenantId == tenantId,
             entity.Id,
             cancellationToken);
         Apply(entity, model, moduleName);
@@ -67,6 +70,7 @@ public class ModuleSettingManager : BaseManager<ModuleSetting, Guid>
         string moduleName)
     {
         entity.ModuleName = moduleName;
+        entity.TenantId = model.TenantId;
         entity.IsEnabled = model.IsEnabled;
         entity.TtlSeconds = model.TtlSeconds;
         entity.RateLimitEnabled = model.RateLimitEnabled;

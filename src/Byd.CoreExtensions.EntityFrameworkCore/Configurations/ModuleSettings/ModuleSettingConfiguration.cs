@@ -31,8 +31,9 @@ public sealed class ModuleSettingConfiguration : IEntityTypeConfiguration<Module
             .HasDefaultValue(ModuleSettingConsts.DefaultRateLimitWindowSeconds);
         builder.Property(entity => entity.IdempotencyTtlSeconds)
             .HasDefaultValue(IdempotencyConsts.DefaultTtlSeconds);
-        builder.HasIndex(entity => entity.ModuleName)
+        // Tekillik kapsam basinadir: ayni modul adi host satiri ve her tenant icin birer kez bulunabilir.
+        builder.HasIndex(entity => new { entity.ModuleName, entity.TenantId })
             .IsUnique()
-            .HasDatabaseName(ModuleSettingConsts.ModuleNameIndex);
+            .HasDatabaseName(ModuleSettingConsts.ModuleScopeIndex);
     }
 }

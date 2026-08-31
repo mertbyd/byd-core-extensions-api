@@ -14,7 +14,7 @@ namespace Byd.CoreExtensions.Data.ModuleSettings;
 /// <summary>
 /// Bu servisin ModuleSetting satirini varsayilan degerlerle idempotent olarak olusturur.
 /// </summary>
-// islevi: Host'un beyan ettigi modul adina ait satir yoksa Manager ile kurar ve repository uzerinden kalici hale getirir.
+// islevi: Host'un beyan ettigi modul adina ait host kapsamli satir yoksa Manager ile kurar ve repository uzerinden kalici hale getirir.
 // sistemdeki gorevi: Rate limit okuyucusunun yonetilebilir bir baslangic satirina sahip olmasini saglar; mevcut admin degerlerini korur.
 public class ModuleSettingDataSeeder : IDataSeedContributor, ITransientDependency
 {
@@ -32,13 +32,15 @@ public class ModuleSettingDataSeeder : IDataSeedContributor, ITransientDependenc
         _repository = repository;
     }
 
-    // Bu modulun satiri yoksa tablo varsayilanlariyla ekler; mevcut satira dokunmaz.
+    // Bu modulun host satiri yoksa tablo varsayilanlariyla ekler; mevcut satira dokunmaz.
     [UnitOfWork]
     public async Task SeedAsync(DataSeedContext context)
     {
-        var current = await _repository.FindAsync(
-            setting => setting.ModuleName == _moduleNameProvider.Value,
-            cancellationToken: CancellationToken.None);
+        // Seed daima host kapsamini kurar; tenant satirlari yonetim ucundan acilir.
+        var current = await _repository.FindForScopeAsync(
+            _moduleNameProvider.Value,
+            tenantId: null,
+            CancellationToken.None);
         if (current is not null)
         {
             return;

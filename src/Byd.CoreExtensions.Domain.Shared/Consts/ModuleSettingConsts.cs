@@ -8,7 +8,7 @@ namespace Byd.CoreExtensions.Consts;
 public static class ModuleSettingConsts
 {
     public const string TableName = "ModuleSettings";
-    public const string ModuleNameIndex = "IX_ModuleSettings_ModuleName";
+    public const string ModuleScopeIndex = "IX_ModuleSettings_ModuleName_TenantId";
     public const int MaxModuleNameLength = 128;
     public const int DefaultTtlSeconds = 10;
     public const int DefaultRateLimitPermitLimit = 300;

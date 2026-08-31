@@ -1,3 +1,4 @@
+using System;
 using Byd.CoreExtensions.Consts;
 
 namespace Byd.CoreExtensions.Models.ModuleSettings;
@@ -10,6 +11,10 @@ namespace Byd.CoreExtensions.Models.ModuleSettings;
 public abstract class ModuleSettingInputModel
 {
     public string ModuleName { get; set; } = default!;
+
+    // Satirin kapsami; null birakilirsa host satiri olarak yazilir ve tum tenant'lar icin gecerli olur.
+    public Guid? TenantId { get; set; }
+
     public bool IsEnabled { get; set; }
     public int TtlSeconds { get; set; } = ModuleSettingConsts.DefaultTtlSeconds;
     public bool RateLimitEnabled { get; set; }

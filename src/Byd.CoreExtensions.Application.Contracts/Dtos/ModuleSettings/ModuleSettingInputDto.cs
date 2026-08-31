@@ -1,3 +1,4 @@
+using System;
 using Byd.CoreExtensions.Consts;
 
 namespace Byd.CoreExtensions.Dtos.ModuleSettings;
@@ -10,6 +11,10 @@ namespace Byd.CoreExtensions.Dtos.ModuleSettings;
 public abstract class ModuleSettingInputDto
 {
     public string ModuleName { get; set; } = default!;
+
+    // Satirin kapsami; bos birakilirsa host satiri olarak yazilir ve tum tenant'lar icin gecerli olur.
+    public Guid? TenantId { get; set; }
+
     public bool IsEnabled { get; set; }
     public int TtlSeconds { get; set; } = ModuleSettingConsts.DefaultTtlSeconds;
     public bool RateLimitEnabled { get; set; }

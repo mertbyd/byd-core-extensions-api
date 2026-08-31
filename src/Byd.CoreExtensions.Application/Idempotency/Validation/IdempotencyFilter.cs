@@ -21,12 +21,13 @@ using Byd.CoreExtensions.Providers;
 using Volo.Abp.Caching;
 using Volo.Abp.DependencyInjection;
 using Volo.Abp.Http;
+using Volo.Abp.MultiTenancy;
 using Volo.Abp.Timing;
 namespace Byd.CoreExtensions.Idempotency;
 /// <summary>
 /// Degistiren JSON isteklerinde mukerrer gonderimi dagitik cache ile engeller.
 /// </summary>
-// islevi: Modul ayari aciksa ve yol muaf degilse mutating JSON istegin imzasini cache'e yazar, tekrarini 409 ile keser ve basarisiz istekte imzayi temizler.
+// islevi: Istegin kapsamina ait modul ayari aciksa ve istek muaf degilse mutating JSON istegin imzasini cache'e yazar, tekrarini 409 ile keser ve basarisiz istekte imzayi temizler.
 // sistemdeki gorevi: Header, attribute ve veritabani tablosu gerektirmeden uygulama genelinde kisa sureli mukerrer istek korumasi saglar.
 public class IdempotencyFilter : IAsyncResourceFilter, ITransientDependency
 {
@@ -36,6 +37,7 @@ public class IdempotencyFilter : IAsyncResourceFilter, ITransientDependency
     private readonly IdempotencyRequestHasher _hasher;
     private readonly IDistributedCache<IdempotencyRecord> _cache;
     private readonly IDistributedCache<ModuleSettingCacheModel> _settingCache;
+    private readonly ICurrentTenant _currentTenant;
     private readonly IClock _clock;
     private readonly IStringLocalizer<CoreExtensionsResource> _localizer;
     public IdempotencyFilter(
@@ -45,6 +47,7 @@ public class IdempotencyFilter : IAsyncResourceFilter, ITransientDependency
         IdempotencyRequestHasher hasher,
         IDistributedCache<IdempotencyRecord> cache,
         IDistributedCache<ModuleSettingCacheModel> settingCache,
+        ICurrentTenant currentTenant,
         IClock clock,
         IStringLocalizer<CoreExtensionsResource> localizer)
     {
@@ -54,6 +57,7 @@ public class IdempotencyFilter : IAsyncResourceFilter, ITransientDependency
         _hasher = hasher;
         _cache = cache;
         _settingCache = settingCache;
+        _currentTenant = currentTenant;
         _clock = clock;
         _localizer = localizer;
     }
@@ -111,21 +115,39 @@ public class IdempotencyFilter : IAsyncResourceFilter, ITransientDependency
     {
         return request.ContentType?.Contains("application/json", StringComparison.OrdinalIgnoreCase) == true &&
                (request.ContentLength is null || request.ContentLength <= IdempotencyConsts.MaxBodyBytes) &&
-               !IsExcludedPath(request.Path);
+               !IsExcluded(request);
     }
 
-    // Yolun host tarafindan beyan edilen muafiyet on eklerinden biriyle baslayip baslamadigini bildirir.
-    private bool IsExcludedPath(PathString path)
+    // Istegin host tarafindan beyan edilen muafiyetlerden birine girip girmedigini bildirir.
+    // Bir beyan ya bir HTTP metodudur ("/get" tum GET istekleri) ya da bir yol on ekidir
+    // ("/api/orders" o alt agacin tamami). Once metot denenir, tutmazsa yol denenir.
+    private bool IsExcluded(HttpRequest request)
     {
-        foreach (var excludedPath in _moduleOptions.Value.ExcludePaths)
+        foreach (var exclusion in _moduleOptions.Value.ExcludePaths)
         {
-            if (path.StartsWithSegments(excludedPath, StringComparison.OrdinalIgnoreCase))
+            if (MatchesMethod(exclusion, request.Method) || MatchesPath(exclusion, request.Path))
             {
                 return true;
             }
         }
 
         return false;
+    }
+
+    // Beyani bastaki ayiractan arindirip istegin HTTP metoduyla karsilastirir.
+    // Metot adi listesi tutulmaz; karsilastirma dogrudan istegin metoduna yapildigi icin
+    // GET, POST, PATCH ve ileride eklenecek her metot ayrica kod degisikligi olmadan calisir.
+    private static bool MatchesMethod(string exclusion, string method)
+    {
+        return string.Equals(exclusion.TrimStart('/'), method, StringComparison.OrdinalIgnoreCase);
+    }
+
+    // Beyani yol on eki olarak dener. PathString cevrimi bastaki ayiraci zorunlu tuttugu icin
+    // ayiracla baslamayan beyanlar yol olarak degerlendirilmez; boyle bir beyan yalnizca metot olabilir.
+    private static bool MatchesPath(string exclusion, PathString path)
+    {
+        return exclusion.StartsWith('/') &&
+               path.StartsWithSegments(exclusion, StringComparison.OrdinalIgnoreCase);
     }
     // Govdeyi ust sinira kadar okuyup yeniden okunabilir birakir; sinir asilirsa null doner.
     private static async Task<byte[]?> ReadBodyAsync(HttpRequest request)
@@ -159,14 +181,17 @@ public class IdempotencyFilter : IAsyncResourceFilter, ITransientDependency
         }
     }
     // Ayar satirini TTL suresince cache'ten okur; sure dolunca tabloyu bir kez yeniden okur.
+    // Istek bir tenant baglamindaysa once o tenant'in satiri, yoksa host satiri cozulur. Cache anahtarina
+    // tenant eklenmez: ABP'nin cache anahtari normalizer'i mevcut tenant'i anahtara kendisi tasir.
     private async Task<ModuleSettingCacheModel?> FindSettingAsync(CancellationToken cancellationToken)
     {
         var moduleName = _moduleNameProvider.Value;
         return await _settingCache.GetOrAddAsync(
             moduleName,
-            async () => ToCacheModel(await _moduleSettingRepository.FindAsync(
-                setting => setting.ModuleName == moduleName,
-                cancellationToken: cancellationToken))!,
+            async () => ToCacheModel(await _moduleSettingRepository.FindForScopeAsync(
+                moduleName,
+                _currentTenant.Id,
+                cancellationToken))!,
             () => new DistributedCacheEntryOptions
             {
                 AbsoluteExpirationRelativeToNow =
