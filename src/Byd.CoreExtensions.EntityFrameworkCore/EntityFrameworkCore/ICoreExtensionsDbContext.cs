@@ -1,8 +1,8 @@
-﻿using Volo.Abp.Data;
+using Volo.Abp.Data;
 using Volo.Abp.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Byd.CoreExtensions.Entities;
-using Byd.CoreExtensions.Entities.RateLimit;
+using Byd.CoreExtensions.Entities.ModuleSettings;
 
 namespace Byd.CoreExtensions.EntityFrameworkCore;
 
