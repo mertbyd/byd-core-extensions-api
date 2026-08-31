@@ -1,6 +1,7 @@
 using System.Threading.Tasks;
 using Byd.CoreExtensions.Consts;
 using Byd.CoreExtensions.Interfaces;
+using Byd.CoreExtensions.Providers;
 using Volo.Abp.DependencyInjection;
 
 namespace Byd.CoreExtensions.RateLimiting;
@@ -13,12 +14,15 @@ namespace Byd.CoreExtensions.RateLimiting;
 public class RateLimitStateRefresher : ITransientDependency
 {
     private readonly IModuleSettingRepository _repository;
+    private readonly CurrentModuleNameProvider _moduleNameProvider;
     private readonly RateLimitState _state;
     public RateLimitStateRefresher(
         IModuleSettingRepository repository,
+        CurrentModuleNameProvider moduleNameProvider,
         RateLimitState state)
     {
         _repository = repository;
+        _moduleNameProvider = moduleNameProvider;
         _state = state;
     }
     // Son okunan satirin worker tarafindan kullanilacak yenileme suresini tasir.
@@ -28,7 +32,7 @@ public class RateLimitStateRefresher : ITransientDependency
     public async Task RefreshAsync()
     {
         var moduleSetting = await _repository.FindAsync(
-            setting => setting.ModuleName == ModuleSettingConsts.CurrentModuleName);
+            setting => setting.ModuleName == _moduleNameProvider.Value);
         if (moduleSetting is null)
         {
             LastTtlSeconds = ModuleSettingConsts.DefaultTtlSeconds;

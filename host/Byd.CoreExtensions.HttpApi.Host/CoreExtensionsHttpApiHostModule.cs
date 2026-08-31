@@ -7,6 +7,7 @@ using Microsoft.OpenApi;
 using Byd.CoreExtensions.Consts;
 using Byd.CoreExtensions.EntityFrameworkCore;
 using Byd.CoreExtensions.Extensions;
+using Byd.CoreExtensions.Options;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using System.Threading.Tasks;
 using Volo.Abp;
@@ -36,9 +37,16 @@ public class CoreExtensionsHttpApiHostModule : AbpModule
         ServiceConfigurationContextExtension.ResolveSchemaAndPrefix();
     }
 
-    // Temel Swagger dokumanini, cakismasiz schema kimliklerini ve XML aciklamalarini kaydeder.
+    // Modul beyanini, temel Swagger dokumanini, cakismasiz schema kimliklerini ve XML aciklamalarini kaydeder.
     public override void ConfigureServices(ServiceConfigurationContext context)
     {
+        // Bu host'un ModuleSettings satir adi ve anti-duplicate muafiyetleri; beyan zorunludur.
+        Configure<CoreExtensionsModuleOptions>(options =>
+        {
+            options.ModuleName = "CoreExtensions";
+       
+        });
+
         context.Services.AddAbpSwaggerGen(options =>
         {
             options.SwaggerDoc(

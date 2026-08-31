@@ -7,9 +7,6 @@ namespace Byd.CoreExtensions.Consts;
 // sistemdeki gorevi: Domain, validation ve EF konfigurasyonunun ayni kararli sinirlari kullanmasini saglar.
 public static class ModuleSettingConsts
 {
-    // Bu servisin ModuleSettings tablosundaki kendi satirinin adi.
-    public const string CurrentModuleName = "CoreExtensions";
-
     public const string TableName = "ModuleSettings";
     public const string ModuleNameIndex = "IX_ModuleSettings_ModuleName";
     public const int MaxModuleNameLength = 128;
