@@ -28,5 +28,10 @@ public abstract class ModuleSettingInputDtoValidatorBase<TDto> : AbstractValidat
         RuleFor(input => input.RateLimitWindowSeconds)
             .InclusiveBetween(ModuleSettingConsts.MinWindowSeconds, ModuleSettingConsts.MaxWindowSeconds)
             .WithErrorCode(ModuleSettingExceptionCodes.InvalidRateLimitWindowSeconds);
+        RuleFor(input => input.IdempotencyTtlSeconds)
+            .InclusiveBetween(
+                IdempotencyConsts.MinTtlSeconds,
+                IdempotencyConsts.MaxTtlSeconds)
+            .WithErrorCode(ModuleSettingExceptionCodes.InvalidIdempotencyTtlSeconds);
     }
 }

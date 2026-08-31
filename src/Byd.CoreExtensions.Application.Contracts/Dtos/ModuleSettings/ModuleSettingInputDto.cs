@@ -15,4 +15,6 @@ public abstract class ModuleSettingInputDto
     public bool RateLimitEnabled { get; set; }
     public int RateLimitPermitLimit { get; set; } = ModuleSettingConsts.DefaultRateLimitPermitLimit;
     public int RateLimitWindowSeconds { get; set; } = ModuleSettingConsts.DefaultRateLimitWindowSeconds;
+    public bool IdempotencyEnabled { get; set; }
+    public int IdempotencyTtlSeconds { get; set; } = IdempotencyConsts.DefaultTtlSeconds;
 }

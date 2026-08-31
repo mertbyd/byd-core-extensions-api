@@ -35,6 +35,18 @@ public class ModuleSettingAppService : CoreExtensionsAppService, IModuleSettingA
         var entity = await Manager.EnsureExistsAsync(id, CancellationTokenProvider.Token);
         return Mapper.Map(entity);
     }
+    // Kimligi verilen modul ayarinin yalniz rate limit alanlarini getirir.
+    public virtual async Task<ModuleSettingRateLimitDto> GetRateLimitAsync(Guid id)
+    {
+        var entity = await Manager.EnsureExistsAsync(id, CancellationTokenProvider.Token);
+        return Mapper.MapRateLimit(entity);
+    }
+    // Kimligi verilen modul ayarinin yalniz idempotency alanlarini getirir.
+    public virtual async Task<ModuleSettingIdempotencyDto> GetIdempotencyAsync(Guid id)
+    {
+        var entity = await Manager.EnsureExistsAsync(id, CancellationTokenProvider.Token);
+        return Mapper.MapIdempotency(entity);
+    }
     // Tum modul ayarlarini detay iliskisi yuklemeden repository'den getirir.
     public virtual async Task<List<ModuleSettingDto>> GetListAsync()
     {

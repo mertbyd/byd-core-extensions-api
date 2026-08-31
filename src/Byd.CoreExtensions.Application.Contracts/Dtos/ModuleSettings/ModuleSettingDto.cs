@@ -16,5 +16,7 @@ public class ModuleSettingDto
     public bool RateLimitEnabled { get; set; }
     public int RateLimitPermitLimit { get; set; }
     public int RateLimitWindowSeconds { get; set; }
+    public bool IdempotencyEnabled { get; set; }
+    public int IdempotencyTtlSeconds { get; set; }
     public DateTime? LastModificationTime { get; set; }
 }

@@ -72,5 +72,7 @@ public class ModuleSettingManager : BaseManager<ModuleSetting, Guid>
         entity.RateLimitEnabled = model.RateLimitEnabled;
         entity.RateLimitPermitLimit = model.RateLimitPermitLimit;
         entity.RateLimitWindowSeconds = model.RateLimitWindowSeconds;
+        entity.IdempotencyEnabled = model.IdempotencyEnabled;
+        entity.IdempotencyTtlSeconds = model.IdempotencyTtlSeconds;
     }
 }

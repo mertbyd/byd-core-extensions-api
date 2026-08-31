@@ -17,5 +17,7 @@ public partial class ModuleSettingMapper
     public partial ModuleSettingCreateModel Map(CreateModuleSettingDto source);
     public partial ModuleSettingUpdateModel Map(UpdateModuleSettingDto source);
     public partial ModuleSettingDto Map(ModuleSetting source);
+    public partial ModuleSettingRateLimitDto MapRateLimit(ModuleSetting source);
+    public partial ModuleSettingIdempotencyDto MapIdempotency(ModuleSetting source);
     public partial List<ModuleSettingDto> Map(List<ModuleSetting> source);
 }

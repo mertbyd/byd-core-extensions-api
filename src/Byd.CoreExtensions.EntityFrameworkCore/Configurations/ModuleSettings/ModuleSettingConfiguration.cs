@@ -29,6 +29,8 @@ public sealed class ModuleSettingConfiguration : IEntityTypeConfiguration<Module
             .HasDefaultValue(ModuleSettingConsts.DefaultRateLimitPermitLimit);
         builder.Property(entity => entity.RateLimitWindowSeconds)
             .HasDefaultValue(ModuleSettingConsts.DefaultRateLimitWindowSeconds);
+        builder.Property(entity => entity.IdempotencyTtlSeconds)
+            .HasDefaultValue(IdempotencyConsts.DefaultTtlSeconds);
         builder.HasIndex(entity => entity.ModuleName)
             .IsUnique()
             .HasDatabaseName(ModuleSettingConsts.ModuleNameIndex);

@@ -16,7 +16,7 @@ namespace Byd.CoreExtensions.Controllers.ModuleSettings;
 // sistemdeki gorevi: ModuleSetting tam CRUD dikey kesitinin ince HTTP giris noktasidir.
 [ApiController]
 [Route(ModuleSettingRoutes.Root)]
-public class ModuleSettingController : CoreExtensionsController
+public class ModuleSettingController : CoreExtensionsController//todo : auth module gelince buraya permisio atılacak şuan test edebilmek için atmadım
 {
     /// <summary>ModuleSetting AppService'ini lazy cozer.</summary>
     private IModuleSettingAppService AppService =>
@@ -32,6 +32,28 @@ public class ModuleSettingController : CoreExtensionsController
     public virtual async Task<Result<ModuleSettingDto>> Get(Guid id)
     {
         var result = await AppService.GetAsync(id);
+        return result;
+    }
+    /// <summary>
+    /// Kimligi verilen modul ayari kaydinin rate limit alanlarini getirir.
+    /// </summary>
+    /// <param name="id">Rate limit alanlari okunacak modul ayari kaydinin benzersiz kimligi.</param>
+    /// <returns>Modul anahtarlari ve rate limit ayarlarini iceren cevap.</returns>
+    [HttpGet(ModuleSettingRoutes.RateLimitById)]
+    public virtual async Task<Result<ModuleSettingRateLimitDto>> GetRateLimit(Guid id)
+    {
+        var result = await AppService.GetRateLimitAsync(id);
+        return result;
+    }
+    /// <summary>
+    /// Kimligi verilen modul ayari kaydinin idempotency alanlarini getirir.
+    /// </summary>
+    /// <param name="id">Idempotency alanlari okunacak modul ayari kaydinin benzersiz kimligi.</param>
+    /// <returns>Modul anahtarlari ve idempotency ayarlarini iceren cevap.</returns>
+    [HttpGet(ModuleSettingRoutes.IdempotencyById)]
+    public virtual async Task<Result<ModuleSettingIdempotencyDto>> GetIdempotency(Guid id)
+    {
+        var result = await AppService.GetIdempotencyAsync(id);
         return result;
     }
     /// <summary>

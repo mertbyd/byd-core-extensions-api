@@ -16,6 +16,12 @@ public interface IModuleSettingAppService : IApplicationService
     // Kimligi verilen modul ayarini getirir.
     Task<ModuleSettingDto> GetAsync(Guid id);
 
+    // Kimligi verilen modul ayarinin yalniz rate limit alanlarini getirir.
+    Task<ModuleSettingRateLimitDto> GetRateLimitAsync(Guid id);
+
+    // Kimligi verilen modul ayarinin yalniz idempotency alanlarini getirir.
+    Task<ModuleSettingIdempotencyDto> GetIdempotencyAsync(Guid id);
+
     // Tum modul ayari kayitlarini getirir.
     Task<List<ModuleSettingDto>> GetListAsync();
 
