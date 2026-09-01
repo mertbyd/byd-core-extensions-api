@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Reflection;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -41,10 +42,11 @@ public class CoreExtensionsHttpApiHostModule : AbpModule
     public override void ConfigureServices(ServiceConfigurationContext context)
     {
         // Bu host'un ModuleSettings satir adi ve anti-duplicate muafiyetleri; beyan zorunludur.
+        // Satir adi giris assembly'sinin adindan host son eki atilarak turetilir.
         Configure<CoreExtensionsModuleOptions>(options =>
         {
-            options.ModuleName = "CoreExtensions";
-       
+            options.ModuleName = Assembly.GetEntryAssembly()?.GetName().Name?
+                .Replace(".HttpApi.Host", string.Empty);
         });
 
         context.Services.AddAbpSwaggerGen(options =>

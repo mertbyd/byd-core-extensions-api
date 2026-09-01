@@ -113,7 +113,7 @@ public class IdempotencyFilter : IAsyncResourceFilter, ITransientDependency
     // Govdesi JSON olan, boyut sinirini asmayan ve muaf tutulmamis istekleri kapsama alir.
     private bool IsEligible(HttpRequest request)
     {
-        return request.ContentType?.Contains("application/json", StringComparison.OrdinalIgnoreCase) == true &&
+        return request.ContentType?.Contains(IdempotencyConsts.JsonContentType, StringComparison.OrdinalIgnoreCase) == true &&
                (request.ContentLength is null || request.ContentLength <= IdempotencyConsts.MaxBodyBytes) &&
                !IsExcluded(request);
     }
