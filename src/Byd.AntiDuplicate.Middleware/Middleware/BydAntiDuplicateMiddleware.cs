@@ -11,6 +11,7 @@ using Byd.CoreExtensions.AntiDuplicate;
 using Byd.CoreExtensions.Consts;
 using Byd.CoreExtensions.ExceptionCodes;
 using Byd.CoreExtensions.Localization;
+using Byd.CoreExtensions.ModuleSettings;
 using Byd.CoreExtensions.Options;
 using Volo.Abp.Caching;
 using Volo.Abp.DependencyInjection;

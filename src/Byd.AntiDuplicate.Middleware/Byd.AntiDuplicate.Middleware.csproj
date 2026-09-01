@@ -14,6 +14,7 @@
     <PackageReference Include="Volo.Abp.Json" Version="10.3.0" />
     <PackageReference Include="Volo.Abp.Timing" Version="10.3.0" />
     <PackageReference Include="Volo.Abp.Users.Abstractions" Version="10.3.0" />
+    <ProjectReference Include="..\Byd.CoreExtensions.Application.Contracts\Byd.CoreExtensions.Application.Contracts.csproj" />
     <ProjectReference Include="..\Byd.CoreExtensions.Domain.Shared\Byd.CoreExtensions.Domain.Shared.csproj" />
   </ItemGroup>
 

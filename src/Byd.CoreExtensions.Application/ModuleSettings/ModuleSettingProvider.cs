@@ -9,12 +9,14 @@ using Byd.CoreExtensions.Providers;
 using Volo.Abp.Caching;
 using Volo.Abp.DependencyInjection;
 using Volo.Abp.MultiTenancy;
-namespace Byd.CoreExtensions.AntiDuplicate;
+
+namespace Byd.CoreExtensions.ModuleSettings;
+
 /// <summary>
-/// Mukerrer istek korumasinin ayar okumasini repository uzerinden karsilar.
+/// Modul ayari okumalarini repository ve dagitik cache uzerinden karsilar.
 /// </summary>
-// islevi: Beyan edilen modul adinin istek kapsamindaki satirini TTL boyunca cache'ten okur, cache bosken tabloya bir kez gider ve sade goruntuye cevirir.
-// sistemdeki gorevi: Domain.Shared'daki okuma sozlesmesinin tek uygulamasi. Repository ve entity bu katmanda kaldigi icin koruma tarafi Domain'e bagimli olmadan calisir.
+// islevi: Beyan edilen modul adinin kiraci veya host kapsamli satirini okur ve merkezi cache modeline donusturur.
+// sistemdeki gorevi: Domain.Shared'daki okuma sozlesmesinin tek uygulamasi olarak tablo erisimini tum tuketiciler icin merkezilestirir.
 public class ModuleSettingProvider : IModuleSettingProvider, ITransientDependency
 {
     private readonly IModuleSettingRepository _moduleSettingRepository;
@@ -51,7 +53,35 @@ public class ModuleSettingProvider : IModuleSettingProvider, ITransientDependenc
             },
             token: cancellationToken);
     }
-    // ModuleSetting entity'sini korumaya gereken sade cache modeline donusturur.
+    // Host kapsaminda taze ayar okuyup eski host cache kaydini yeni goruntuyle degistirir.
+    public async Task<ModuleSettingCacheModel?> RefreshHostAsync(CancellationToken cancellationToken = default)
+    {
+        using (_currentTenant.Change(null))
+        {
+            var moduleName = _moduleNameProvider.Value;
+            await _settingCache.RemoveAsync(moduleName, token: cancellationToken);
+            var setting = ToCacheModel(await _moduleSettingRepository.FindForScopeAsync(
+                moduleName,
+                tenantId: null,
+                cancellationToken));
+            if (setting is null)
+            {
+                return null;
+            }
+
+            await _settingCache.SetAsync(
+                moduleName,
+                setting,
+                new DistributedCacheEntryOptions
+                {
+                    AbsoluteExpirationRelativeToNow =
+                        TimeSpan.FromSeconds(ModuleSettingConsts.DefaultTtlSeconds)
+                },
+                token: cancellationToken);
+            return setting;
+        }
+    }
+    // ModuleSetting entity'sini tum ayar tuketicilerinin kullandigi merkezi cache modeline donusturur.
     private static ModuleSettingCacheModel? ToCacheModel(ModuleSetting? setting)
     {
         return setting is null
@@ -60,7 +90,11 @@ public class ModuleSettingProvider : IModuleSettingProvider, ITransientDependenc
             {
                 IsEnabled = setting.IsEnabled,
                 IdempotencyEnabled = setting.IdempotencyEnabled,
-                IdempotencyTtlSeconds = setting.IdempotencyTtlSeconds
+                IdempotencyTtlSeconds = setting.IdempotencyTtlSeconds,
+                RateLimitEnabled = setting.RateLimitEnabled,
+                RateLimitPermitLimit = setting.RateLimitPermitLimit,
+                RateLimitWindowSeconds = setting.RateLimitWindowSeconds,
+                TtlSeconds = setting.TtlSeconds
             };
     }
 }
