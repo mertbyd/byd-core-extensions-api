@@ -7,6 +7,7 @@ using Byd.CoreExtensions.ExceptionCodes;
 using Byd.CoreExtensions.RateLimiting;
 using Volo.Abp;
 using Volo.Abp.Application;
+using Volo.Abp.BackgroundWorkers;
 using Volo.Abp.Caching;
 using Volo.Abp.DependencyInjection;
 using Volo.Abp.Mapperly;
@@ -18,10 +19,11 @@ namespace Byd.CoreExtensions;
     typeof(CoreExtensionsApplicationContractsModule),
     typeof(AbpDddApplicationModule),
     typeof(AbpCachingModule),
-    typeof(AbpMapperlyModule)
+    typeof(AbpMapperlyModule),
+    typeof(AbpBackgroundWorkersModule)
     )]
 // islevi: Application katmaninin ABP modul kompozisyonunu ve servis kayitlarini kurar.
-// sistemdeki gorevi: Korumalari kaydeder ve host'un modulu pipeline'ina bagladigini acilista dogrular. Ayar satirini yazma isi host'un cagirdigi UseCoreExtensions uzantisina aittir.
+// sistemdeki gorevi: Korumalari kaydeder, host'un modulu pipeline'ina bagladigini acilista dogrular ve rate limit ayarini periyodik tazeleyen isciyi devreye alir. Ayar satirini yazma isi host'un cagirdigi UseCoreExtensions uzantisina aittir.
 public class CoreExtensionsApplicationModule : AbpModule
 {
     // Rate limit motorunu, API anahtari dogrulamasini ve Mapperly esleyicisini servis koleksiyonuna kaydeder.
@@ -32,11 +34,13 @@ public class CoreExtensionsApplicationModule : AbpModule
         context.Services.AddCoreExtensionsApiKeyValidation();
         context.Services.AddMapperlyObjectMapper<CoreExtensionsApplicationModule>();
     }
-    // Host'un beyanini dogrular; beyan yoksa modulun acilisi burada durur.
-    public override Task OnPostApplicationInitializationAsync(ApplicationInitializationContext context)
+    // Host'un beyanini dogrular ve tazeleme isciyi baslatir; beyan yoksa modulun acilisi burada durur.
+    // Isci ilk turunu kendi periyodunda calistirir; acilistaki ilk yukleme UseCoreExtensions
+    // uzantisindaki snapshot okumasindan gelir.
+    public override async Task OnPostApplicationInitializationAsync(ApplicationInitializationContext context)
     {
         EnsureHostConfiguredPipeline(context);
-        return Task.CompletedTask;
+        await context.AddBackgroundWorkerAsync<RateLimitStateWorker>();
     }
 
     // host UseCoreExtensions cagirmadiysa acilisi durdurur; web olmayan host'lari atlar.
