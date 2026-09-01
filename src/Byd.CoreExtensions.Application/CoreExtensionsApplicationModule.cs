@@ -6,7 +6,6 @@ using Byd.CoreExtensions.Idempotency;
 using Byd.CoreExtensions.RateLimiting;
 using Volo.Abp;
 using Volo.Abp.Application;
-using Volo.Abp.BackgroundWorkers;
 using Volo.Abp.Caching;
 using Volo.Abp.Data;
 using Volo.Abp.Mapperly;
@@ -18,11 +17,10 @@ namespace Byd.CoreExtensions;
     typeof(CoreExtensionsApplicationContractsModule),
     typeof(AbpDddApplicationModule),
     typeof(AbpCachingModule),
-    typeof(AbpMapperlyModule),
-    typeof(AbpBackgroundWorkersModule)
+    typeof(AbpMapperlyModule)
     )]
 // islevi: Application katmaninin ABP modul kompozisyonunu ve servis kayitlarini kurar.
-// sistemdeki gorevi: Mapperly esleyicisini, rate limit, API anahtari ve anti-duplicate korumasini kaydeder; baslangicta beyan edilen modul satirini yazar, snapshot'lari yukler ve rate limit ayarini TTL periyoduyla tazeleyen isciyi baslatir.
+// sistemdeki gorevi: Mapperly esleyicisini, rate limit, API anahtari ve anti-duplicate korumasini kaydeder; baslangicta beyan edilen modul satirini yazar ve rate limit ile API anahtari snapshot'larini yukler.
 public class CoreExtensionsApplicationModule : AbpModule
 {
     // Rate limit motorunu, API anahtari dogrulamasini, anti-duplicate filtresini ve Mapperly esleyicisini servis koleksiyonuna kaydeder.
@@ -33,13 +31,11 @@ public class CoreExtensionsApplicationModule : AbpModule
         context.Services.AddMapperlyObjectMapper<CoreExtensionsApplicationModule>();
         context.Services.AddAntiDuplicate();
     }
-    // Once beyan edilen modul satirini yazar, sonra bellek goruntulerini yukler ve tazeleme isciyi devreye alir.
+    // Once beyan edilen modul satirini yazar, sonra bellek goruntulerini yukler.
     public override async Task OnApplicationInitializationAsync(ApplicationInitializationContext context)
     {
         await EnsureModuleSettingAsync(context);
         await LoadStateSnapshotsAsync(context);
-        // Isci ilk turunu kendi periyodunda calistirir; acilistaki ilk yukleme yukaridaki snapshot okumasindan gelir.
-        await context.AddBackgroundWorkerAsync<RateLimitStateWorker>();
     }
 
     // Beyan edilen modul satirini kendi unit of work'unde yazar; yazma islemi okuma akisina
