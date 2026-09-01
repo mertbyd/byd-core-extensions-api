@@ -21,6 +21,7 @@
     "CoreExtensions.ModuleSetting:00006": "Rate limit window seconds must be between 1 and 86400.",
     "CoreExtensions.ModuleSetting:00007": "Idempotency TTL seconds must be between 1 and 86400.",
     "CoreExtensions.ModuleSetting:00008": "The host did not declare a module name for the module settings row.",
+    "CoreExtensions.ModuleSetting:00009": "The host did not configure the CoreExtensions HTTP pipeline. app.UseCoreExtensions() must be called.",
     "CoreExtensions.ApiKey:00001": "An API key is required for this endpoint.",
     "CoreExtensions.ApiKey:00002": "The provided API key is invalid.",
     "CoreExtensions.ApiKey:00004": "The provided API key has expired.",

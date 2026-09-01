@@ -21,6 +21,7 @@
     "CoreExtensions.ModuleSetting:00006": "Rate limit pencere saniyesi 1 ile 86400 arasında olmalıdır.",
     "CoreExtensions.ModuleSetting:00007": "Idempotency TTL saniyesi 1 ile 86400 arasinda olmalidir.",
     "CoreExtensions.ModuleSetting:00008": "Host, modul ayari satiri icin modul adi beyan etmedi.",
+    "CoreExtensions.ModuleSetting:00009": "Host, CoreExtensions HTTP pipeline'ini yapilandirmadi. app.UseCoreExtensions() cagrilmalidir.",
     "CoreExtensions.ApiKey:00001": "Bu uç nokta için API anahtarı gereklidir.",
     "CoreExtensions.ApiKey:00002": "Gönderilen API anahtarı geçersiz.",
     "CoreExtensions.ApiKey:00004": "Gönderilen API anahtarının süresi dolmuş.",

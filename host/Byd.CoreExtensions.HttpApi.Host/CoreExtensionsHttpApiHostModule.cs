@@ -98,6 +98,8 @@ public class CoreExtensionsHttpApiHostModule : AbpModule
         {
             options.SwaggerEndpoint(SwaggerConsts.DocumentUrl, SwaggerConsts.DocumentTitle);
         });
+        // Modulu bu pipeline'a bagladigimizi beyan eder; cagrilmazsa modul acilista durur.
+        app.UseCoreExtensions();
         app.UseRateLimiter();
         app.UseConfiguredEndpoints();
         return Task.CompletedTask;
