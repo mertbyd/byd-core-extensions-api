@@ -3,103 +3,118 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Filters;
-using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Options;
+using Byd.AntiDuplicate.Middleware.Hashing;
+using Byd.CoreExtensions.AntiDuplicate;
 using Byd.CoreExtensions.Consts;
-using Byd.CoreExtensions.Entities.ModuleSettings;
 using Byd.CoreExtensions.ExceptionCodes;
-using Byd.CoreExtensions.Interfaces;
 using Byd.CoreExtensions.Localization;
-using Byd.CoreExtensions.Models.Idempotency;
-using Byd.CoreExtensions.Models.ModuleSettings;
 using Byd.CoreExtensions.Options;
-using Byd.CoreExtensions.Providers;
 using Volo.Abp.Caching;
 using Volo.Abp.DependencyInjection;
 using Volo.Abp.Http;
-using Volo.Abp.MultiTenancy;
+using Volo.Abp.Json;
 using Volo.Abp.Timing;
-namespace Byd.CoreExtensions.Idempotency;
+namespace Byd.AntiDuplicate.Middleware.Middleware;
 /// <summary>
 /// Degistiren JSON isteklerinde mukerrer gonderimi dagitik cache ile engeller.
 /// </summary>
 // islevi: Istegin kapsamina ait modul ayari aciksa ve istek muaf degilse mutating JSON istegin imzasini cache'e yazar, tekrarini 409 ile keser ve basarisiz istekte imzayi temizler.
 // sistemdeki gorevi: Header, attribute ve veritabani tablosu gerektirmeden uygulama genelinde kisa sureli mukerrer istek korumasi saglar.
-public class IdempotencyFilter : IAsyncResourceFilter, ITransientDependency
+// IMiddleware secildi: konvansiyonel RequestDelegate imzasi middleware'i singleton yapar ve istek basina degisen
+// bagimliliklarin alan olarak tutulmasini imkansiz kilar. IMiddleware ile ABP kaydi istek kapsaminda cozulur.
+public class BydAntiDuplicateMiddleware : IMiddleware, ITransientDependency
 {
-    private readonly IModuleSettingRepository _moduleSettingRepository;
-    private readonly CurrentModuleNameProvider _moduleNameProvider;
+    private readonly IModuleSettingProvider _moduleSettingProvider;
     private readonly IOptions<CoreExtensionsModuleOptions> _moduleOptions;
     private readonly IdempotencyRequestHasher _hasher;
     private readonly IDistributedCache<IdempotencyRecord> _cache;
-    private readonly IDistributedCache<ModuleSettingCacheModel> _settingCache;
-    private readonly ICurrentTenant _currentTenant;
+    private readonly IJsonSerializer _jsonSerializer;
     private readonly IClock _clock;
     private readonly IStringLocalizer<CoreExtensionsResource> _localizer;
-    public IdempotencyFilter(
-        IModuleSettingRepository moduleSettingRepository,
-        CurrentModuleNameProvider moduleNameProvider,
+    public BydAntiDuplicateMiddleware(
+        IModuleSettingProvider moduleSettingProvider,
         IOptions<CoreExtensionsModuleOptions> moduleOptions,
         IdempotencyRequestHasher hasher,
         IDistributedCache<IdempotencyRecord> cache,
-        IDistributedCache<ModuleSettingCacheModel> settingCache,
-        ICurrentTenant currentTenant,
+        IJsonSerializer jsonSerializer,
         IClock clock,
         IStringLocalizer<CoreExtensionsResource> localizer)
     {
-        _moduleSettingRepository = moduleSettingRepository;
-        _moduleNameProvider = moduleNameProvider;
+        _moduleSettingProvider = moduleSettingProvider;
         _moduleOptions = moduleOptions;
         _hasher = hasher;
         _cache = cache;
-        _settingCache = settingCache;
-        _currentTenant = currentTenant;
+        _jsonSerializer = jsonSerializer;
         _clock = clock;
         _localizer = localizer;
     }
     // Kapsam disi istekleri dokunmadan gecirir; uygun isteklerde imzayi cache'e alip tekrari reddeder.
-    public async Task OnResourceExecutionAsync(ResourceExecutingContext context, ResourceExecutionDelegate next)
+    public async Task InvokeAsync(HttpContext context, RequestDelegate next)
     {
-        var request = context.HttpContext.Request;
-        if (!IsMutatingRequest(request.Method) || !IsEligible(request))
+        var setting = await FindApplicableSettingAsync(context);
+        if (setting is null)
         {
-            await next();
+            await next(context);
             return;
         }
-        var cancellationToken = context.HttpContext.RequestAborted;
-        var setting = await FindSettingAsync(cancellationToken);
-        if (setting is null || !setting.IsEnabled || !setting.IdempotencyEnabled)
-        {
-            await next();
-            return;
-        }
-        var body = await ReadBodyAsync(request);
+        var body = await ReadBodyAsync(context.Request);
         if (body is null)
         {
-            await next();
+            await next(context);
             return;
         }
-        var signature = _hasher.Compute(context.HttpContext, body);
+        var cancellationToken = context.RequestAborted;
+        var signature = _hasher.Compute(context, body);
         if (await _cache.GetAsync(signature, token: cancellationToken) is not null)
         {
-            context.Result = CreateFailureResult();
+            await WriteDuplicateResponseAsync(context, cancellationToken);
             return;
         }
+        await ReserveSignatureAsync(signature, setting.IdempotencyTtlSeconds, cancellationToken);
+        try
+        {
+            await next(context);
+        }
+        catch
+        {
+            // Sonraki halka patlarsa rezervasyon kalmamali; istemci ayni istegi tekrar deneyebilsin diye
+            // imza silinir ve hata degistirilmeden ust katmana birakilir.
+            await _cache.RemoveAsync(signature, token: cancellationToken);
+            throw;
+        }
+        if (IsFailedResponse(context.Response.StatusCode))
+            await _cache.RemoveAsync(signature, token: cancellationToken);
+    }
+
+    // Istegin koruma kapsaminda olup olmadigini ve modul ayarinin acik olup olmadigini tek karara indirger.
+    // Kapsam disi veya kapali her durumda null doner; cagiran taraf tek kosulla akisi devam ettirir.
+    private async Task<ModuleSettingCacheModel?> FindApplicableSettingAsync(HttpContext context)
+    {
+        var request = context.Request;
+        if (!IsMutatingRequest(request.Method) || !IsEligible(request))
+        {
+            return null;
+        }
+        var setting = await _moduleSettingProvider.FindCurrentAsync(context.RequestAborted);
+        return setting is not null && setting.IsEnabled && setting.IdempotencyEnabled
+            ? setting
+            : null;
+    }
+
+    // Imzayi ayardan gelen tekrar penceresi boyunca rezerve eder.
+    private async Task ReserveSignatureAsync(string signature, int ttlSeconds, CancellationToken cancellationToken)
+    {
         await _cache.SetAsync(
             signature,
             new IdempotencyRecord { CreationTime = _clock.Now },
             new DistributedCacheEntryOptions
             {
-                AbsoluteExpirationRelativeToNow = TimeSpan.FromSeconds(setting.IdempotencyTtlSeconds)
+                AbsoluteExpirationRelativeToNow = TimeSpan.FromSeconds(ttlSeconds)
             },
             token: cancellationToken);
-        var executed = await next();
-        if (IsFailedExecution(executed))
-            await _cache.RemoveAsync(signature, token: cancellationToken);
     }
 
     // Degistiren HTTP metodu olup olmadigini bildirir.
@@ -180,56 +195,20 @@ public class IdempotencyFilter : IAsyncResourceFilter, ITransientDependency
             request.Body.Position = 0;
         }
     }
-    // Ayar satirini TTL suresince cache'ten okur; sure dolunca tabloyu bir kez yeniden okur.
-    // Istek bir tenant baglamindaysa once o tenant'in satiri, yoksa host satiri cozulur. Cache anahtarina
-    // tenant eklenmez: ABP'nin cache anahtari normalizer'i mevcut tenant'i anahtara kendisi tasir.
-    private async Task<ModuleSettingCacheModel?> FindSettingAsync(CancellationToken cancellationToken)
+    // Yanitin basarisiz olup olmadigini durum kodundan okur. Filtre halindeki tipli action sonucu
+    // artik yok; middleware'in gorebildigi tek isaret HTTP durum kodudur.
+    private static bool IsFailedResponse(int statusCode)
     {
-        var moduleName = _moduleNameProvider.Value;
-        return await _settingCache.GetOrAddAsync(
-            moduleName,
-            async () => ToCacheModel(await _moduleSettingRepository.FindForScopeAsync(
-                moduleName,
-                _currentTenant.Id,
-                cancellationToken))!,
-            () => new DistributedCacheEntryOptions
-            {
-                AbsoluteExpirationRelativeToNow =
-                    TimeSpan.FromSeconds(ModuleSettingConsts.DefaultTtlSeconds)
-            },
-            token: cancellationToken);
-    }
-    // ModuleSetting entity'sini filtreye gereken sade cache modeline donusturur.
-    private static ModuleSettingCacheModel? ToCacheModel(ModuleSetting? setting)
-    {
-        return setting is null
-            ? null
-            : new ModuleSettingCacheModel
-            {
-                IsEnabled = setting.IsEnabled,
-                IdempotencyEnabled = setting.IdempotencyEnabled,
-                IdempotencyTtlSeconds = setting.IdempotencyTtlSeconds
-            };
-    }
-    // Calisan action'in basarisiz olup olmadigini action sonucundan veya HTTP yanit kodundan okur.
-    private static bool IsFailedExecution(ResourceExecutedContext executed)
-    {
-        if (executed.Exception is not null)
-            return true;
-        var statusCode = executed.Result switch
-        {
-            ObjectResult result => result.StatusCode ?? executed.HttpContext.Response.StatusCode,
-            IStatusCodeActionResult result => result.StatusCode ?? executed.HttpContext.Response.StatusCode,
-            _ => executed.HttpContext.Response.StatusCode
-        };
         return statusCode < StatusCodes.Status200OK || statusCode >= StatusCodes.Status300MultipleChoices;
     }
-    // Mukerrer istek kodunu 409 durum koduyla localize ABP hata govdesine cevirir.
-    private ObjectResult CreateFailureResult()
+    // Mukerrer istek kodunu 409 durum koduyla localize ABP hata govdesine cevirip yanita yazar.
+    private async Task WriteDuplicateResponseAsync(HttpContext context, CancellationToken cancellationToken)
     {
         var body = new RemoteServiceErrorResponse(new RemoteServiceErrorInfo(
             _localizer[IdempotencyExceptionCodes.DuplicateRequest],
             code: IdempotencyExceptionCodes.DuplicateRequest));
-        return new ObjectResult(body) { StatusCode = StatusCodes.Status409Conflict };
+        context.Response.StatusCode = StatusCodes.Status409Conflict;
+        context.Response.ContentType = IdempotencyConsts.JsonContentType;
+        await context.Response.WriteAsync(_jsonSerializer.Serialize(body), cancellationToken);
     }
 }

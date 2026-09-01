@@ -48,7 +48,6 @@ public class CoreExtensionsHttpApiHostModule : AbpModule
             options.ModuleName = Assembly.GetEntryAssembly()?.GetName().Name?
                 .Replace(".HttpApi.Host", string.Empty);
         });
-
         context.Services.AddAbpSwaggerGen(options =>
         {
             options.SwaggerDoc(
@@ -62,7 +61,6 @@ public class CoreExtensionsHttpApiHostModule : AbpModule
             IncludeXmlDocumentation(options);
         });
     }
-
     // Controller ve DTO XML yorumlarini Swagger dokumanina tasir; dosya uretilmediyse sessizce atlanir.
     private static void IncludeXmlDocumentation(SwaggerGenOptions options)
     {
@@ -81,7 +79,6 @@ public class CoreExtensionsHttpApiHostModule : AbpModule
             }
         }
     }
-
     // HTTP middleware zincirini API ve Swagger endpointleriyle baslatir.
     public override Task OnApplicationInitializationAsync(ApplicationInitializationContext context)
     {
@@ -90,7 +87,6 @@ public class CoreExtensionsHttpApiHostModule : AbpModule
         {
             app.UseDeveloperExceptionPage();
         }
-
         app.UseCorrelationId();
         app.UseRouting();
         app.UseSwagger();
@@ -98,9 +94,11 @@ public class CoreExtensionsHttpApiHostModule : AbpModule
         {
             options.SwaggerEndpoint(SwaggerConsts.DocumentUrl, SwaggerConsts.DocumentTitle);
         });
-        // Modulu bu pipeline'a bagladigimizi beyan eder; cagrilmazsa modul acilista durur.
-        app.UseCoreExtensions();
         app.UseRateLimiter();
+        // Modulu bu pipeline'a bagladigimizi beyan eder ve mukerrer istek korumasini buraya takar;
+        // cagrilmazsa modul acilista durur. Rate limit'in altinda durur: limiti asan istek govdesi
+        // hic okunmadan reddedilsin diye.
+        app.UseCoreExtensions();
         app.UseConfiguredEndpoints();
         return Task.CompletedTask;
     }

@@ -5,17 +5,16 @@ using Microsoft.AspNetCore.Http;
 using Volo.Abp.DependencyInjection;
 using Volo.Abp.MultiTenancy;
 using Volo.Abp.Users;
-namespace Byd.CoreExtensions.Idempotency;
+namespace Byd.AntiDuplicate.Middleware.Hashing;
 /// <summary>
 /// Bir HTTP isteginden kararli idempotency imzasi uretir.
 /// </summary>
 // islevi: Kiraci, kullanici, metot, yol ve govde ozetini tek SHA256 imzasina indirger.
-// sistemdeki gorevi: Filtrenin mukerrer istekleri istemci header'i olmadan ayirt etmesini saglayan is kuralidir.
+// sistemdeki gorevi: Korumanin mukerrer istekleri istemci header'i olmadan ayirt etmesini saglayan is kuralidir.
 public class IdempotencyRequestHasher : ITransientDependency
 {
     private readonly ICurrentTenant _currentTenant;
     private readonly ICurrentUser _currentUser;
-
     public IdempotencyRequestHasher(
         ICurrentTenant currentTenant,
         ICurrentUser currentUser)
