@@ -10,7 +10,9 @@ public static class ModuleSettingConsts
     public const string TableName = "ModuleSettings";
     public const string ModuleScopeIndex = "IX_ModuleSettings_ModuleName_TenantId";
     public const int MaxModuleNameLength = 128;
+    public const bool DefaultIsEnabled = true;
     public const int DefaultTtlSeconds = 10;
+    public const bool DefaultRateLimitEnabled = true;
     public const int DefaultRateLimitPermitLimit = 300;
     public const int DefaultRateLimitWindowSeconds = 60;
     public const int MinTtlSeconds = 1;

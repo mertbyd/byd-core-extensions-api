@@ -15,6 +15,9 @@ public static class IdempotencyConsts
     // Imzasi hesaplanacak istek govdesinin ust siniri (bayt).
     public const int MaxBodyBytes = 1024 * 1024;
 
+    // Yeni acilan modul satirinda mukerrer istek korumasinin acik gelip gelmedigi.
+    public const bool DefaultEnabled = true;
+
     // Ayni istegin cache'te tutulacagi varsayilan sure (saniye).
     public const int DefaultTtlSeconds = 300;
 

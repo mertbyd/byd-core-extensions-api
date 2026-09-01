@@ -46,12 +46,16 @@ public class ModuleSettingDataSeeder : IDataSeedContributor, ITransientDependenc
             return;
         }
 
+        // Etkinlik bayraklari da varsayilanlardan gelir; modul ilk aciliste korumasiz kalmaz.
         var model = new ModuleSettingCreateModel
         {
             ModuleName = _moduleNameProvider.Value,
+            IsEnabled = ModuleSettingConsts.DefaultIsEnabled,
             TtlSeconds = ModuleSettingConsts.DefaultTtlSeconds,
+            RateLimitEnabled = ModuleSettingConsts.DefaultRateLimitEnabled,
             RateLimitPermitLimit = ModuleSettingConsts.DefaultRateLimitPermitLimit,
             RateLimitWindowSeconds = ModuleSettingConsts.DefaultRateLimitWindowSeconds,
+            IdempotencyEnabled = IdempotencyConsts.DefaultEnabled,
             IdempotencyTtlSeconds = IdempotencyConsts.DefaultTtlSeconds
         };
         var entity = await _manager.CreateAsync(model, CancellationToken.None);
