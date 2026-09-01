@@ -47,8 +47,10 @@ public class RateLimitStateRefresher : ITransientDependency
             return;
         }
         LastTtlSeconds = moduleSetting.TtlSeconds;
+        // Modul ana anahtari kapaliyken alt anahtar tek basina yetmez; rate limit de kapanir.
+        // Mukerrer istek korumasi da ayni kurali uygular, iki koruma tek ana anahtardan beslenir.
         _state.Update(
-            moduleSetting.RateLimitEnabled,
+            moduleSetting.IsEnabled && moduleSetting.RateLimitEnabled,
             moduleSetting.RateLimitPermitLimit,
             moduleSetting.RateLimitWindowSeconds);
     }
