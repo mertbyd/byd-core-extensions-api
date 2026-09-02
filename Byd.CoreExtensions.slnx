@@ -4,6 +4,7 @@
     <Project Path="host/Byd.CoreExtensions.HttpApi.Host/Byd.CoreExtensions.HttpApi.Host.csproj" />
   </Folder>
   <Folder Name="/src/">
+    <Project Path="src/Byd.AntiDuplicate.Middleware/Byd.AntiDuplicate.Middleware.csproj" />
     <Project Path="src/Byd.CoreExtensions.Application.Contracts/Byd.CoreExtensions.Application.Contracts.csproj" />
     <Project Path="src/Byd.CoreExtensions.Application/Byd.CoreExtensions.Application.csproj" />
     <Project Path="src/Byd.CoreExtensions.Domain.Shared/Byd.CoreExtensions.Domain.Shared.csproj" />

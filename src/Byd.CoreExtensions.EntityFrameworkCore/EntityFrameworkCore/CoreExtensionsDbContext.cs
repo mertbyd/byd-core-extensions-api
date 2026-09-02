@@ -1,6 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Volo.Abp.Data;
-using Byd.CoreExtensions.Entities.RateLimit;
+using Byd.CoreExtensions.Entities.ModuleSettings;
 using Volo.Abp.EntityFrameworkCore;
 using Volo.Abp.SettingManagement.EntityFrameworkCore;
 using Byd.CoreExtensions.Entities;

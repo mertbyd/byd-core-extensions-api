@@ -9,4 +9,6 @@ public static class ModuleSettingRoutes
 {
     public const string Root = "api/core-extensions/module-settings";
     public const string ById = "{id:guid}";
+    public const string RateLimitById = "{id:guid}/rate-limit";
+    public const string IdempotencyById = "{id:guid}/idempotency";
 }

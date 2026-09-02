@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Reflection;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -7,6 +8,7 @@ using Microsoft.OpenApi;
 using Byd.CoreExtensions.Consts;
 using Byd.CoreExtensions.EntityFrameworkCore;
 using Byd.CoreExtensions.Extensions;
+using Byd.CoreExtensions.Options;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using System.Threading.Tasks;
 using Volo.Abp;
@@ -36,9 +38,16 @@ public class CoreExtensionsHttpApiHostModule : AbpModule
         ServiceConfigurationContextExtension.ResolveSchemaAndPrefix();
     }
 
-    // Temel Swagger dokumanini, cakismasiz schema kimliklerini ve XML aciklamalarini kaydeder.
+    // Modul beyanini, temel Swagger dokumanini, cakismasiz schema kimliklerini ve XML aciklamalarini kaydeder.
     public override void ConfigureServices(ServiceConfigurationContext context)
     {
+        // Bu host'un ModuleSettings satir adi ve anti-duplicate muafiyetleri; beyan zorunludur.
+        // Satir adi giris assembly'sinin adindan host son eki atilarak turetilir.
+        Configure<CoreExtensionsModuleOptions>(options =>
+        {
+            options.ModuleName = Assembly.GetEntryAssembly()?.GetName().Name?
+                .Replace(".HttpApi.Host", string.Empty);
+        });
         context.Services.AddAbpSwaggerGen(options =>
         {
             options.SwaggerDoc(
@@ -52,7 +61,6 @@ public class CoreExtensionsHttpApiHostModule : AbpModule
             IncludeXmlDocumentation(options);
         });
     }
-
     // Controller ve DTO XML yorumlarini Swagger dokumanina tasir; dosya uretilmediyse sessizce atlanir.
     private static void IncludeXmlDocumentation(SwaggerGenOptions options)
     {
@@ -71,7 +79,6 @@ public class CoreExtensionsHttpApiHostModule : AbpModule
             }
         }
     }
-
     // HTTP middleware zincirini API ve Swagger endpointleriyle baslatir.
     public override Task OnApplicationInitializationAsync(ApplicationInitializationContext context)
     {
@@ -80,7 +87,6 @@ public class CoreExtensionsHttpApiHostModule : AbpModule
         {
             app.UseDeveloperExceptionPage();
         }
-
         app.UseCorrelationId();
         app.UseRouting();
         app.UseSwagger();
@@ -89,6 +95,10 @@ public class CoreExtensionsHttpApiHostModule : AbpModule
             options.SwaggerEndpoint(SwaggerConsts.DocumentUrl, SwaggerConsts.DocumentTitle);
         });
         app.UseRateLimiter();
+        // Modulu bu pipeline'a bagladigimizi beyan eder ve mukerrer istek korumasini buraya takar;
+        // cagrilmazsa modul acilista durur. Rate limit'in altinda durur: limiti asan istek govdesi
+        // hic okunmadan reddedilsin diye.
+        app.UseCoreExtensions();
         app.UseConfiguredEndpoints();
         return Task.CompletedTask;
     }

@@ -20,13 +20,24 @@ public class RateLimitState : IRateLimitState, ISingletonDependency
     public RateLimitSnapshot Current => _current;
 
     // Yeni ayar degerlerini bir sonraki versiyonla snapshot'a yazar; okuma tarafi kilitlenmez.
+    // Degerler aynysa snapshot oldugu gibi birakilir: versiyon partition anahtarinin parcasidir,
+    // bu yuzden degismeyen ayarda artsaydi her tazeleme turu limiter'i sifirdan kurar ve pencere
+    // dolmadan kotayi geri verirdi. Versiyon yalnizca gercek ayar degisiminde ilerler.
     public void Update(bool isEnabled, int permitLimit, int windowSeconds)
     {
+        var current = _current;
+        if (current.IsEnabled == isEnabled &&
+            current.PermitLimit == permitLimit &&
+            current.WindowSeconds == windowSeconds)
+        {
+            return;
+        }
+
         _current = new RateLimitSnapshot(
             isEnabled,
             RateLimitConsts.DefaultAlgorithm,
             permitLimit,
             windowSeconds,
-            _current.Version + 1);
+            current.Version + 1);
     }
 }

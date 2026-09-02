@@ -58,6 +58,10 @@
     "Byd.CoreExtensions.Host.Shared": {
       "path": "host/Byd.CoreExtensions.Host.Shared/Byd.CoreExtensions.Host.Shared.abppkg",
       "folder": "host"
+    },
+    "Byd.AntiDuplicate.Middleware": {
+      "path": "src/Byd.AntiDuplicate.Middleware/Byd.AntiDuplicate.Middleware.abppkg",
+      "folder": "src"
     }
   }
 }

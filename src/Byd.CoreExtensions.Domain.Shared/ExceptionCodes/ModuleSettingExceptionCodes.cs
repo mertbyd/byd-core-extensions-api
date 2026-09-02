@@ -16,4 +16,7 @@ public static class ModuleSettingExceptionCodes
     public const string InvalidTtlSeconds = Prefix + ":00004";
     public const string InvalidRateLimitPermitLimit = Prefix + ":00005";
     public const string InvalidRateLimitWindowSeconds = Prefix + ":00006";
+    public const string InvalidIdempotencyTtlSeconds = Prefix + ":00007";
+    public const string ModuleNameNotConfigured = Prefix + ":00008";
+    public const string PipelineNotConfigured = Prefix + ":00009";
 }
