@@ -56,7 +56,10 @@ public class ModuleSettingDataSeeder : IDataSeedContributor, ITransientDependenc
             RateLimitPermitLimit = ModuleSettingConsts.DefaultRateLimitPermitLimit,
             RateLimitWindowSeconds = ModuleSettingConsts.DefaultRateLimitWindowSeconds,
             IdempotencyEnabled = IdempotencyConsts.DefaultEnabled,
-            IdempotencyTtlSeconds = IdempotencyConsts.DefaultTtlSeconds
+            IdempotencyTtlSeconds = IdempotencyConsts.DefaultTtlSeconds,
+            EventBoxEnabled = EventBoxConsts.DefaultEnabled,
+            FailedEventRetryUnlimited = EventBoxConsts.DefaultFailedEventRetryUnlimited,
+            FailedEventRetryWindowSeconds = EventBoxConsts.DefaultFailedEventRetryWindowSeconds
         };
         var entity = await _manager.CreateAsync(model, CancellationToken.None);
         await _repository.InsertAsync(

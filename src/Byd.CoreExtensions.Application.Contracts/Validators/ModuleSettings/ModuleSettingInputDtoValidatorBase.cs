@@ -33,5 +33,10 @@ public abstract class ModuleSettingInputDtoValidatorBase<TDto> : AbstractValidat
                 IdempotencyConsts.MinTtlSeconds,
                 IdempotencyConsts.MaxTtlSeconds)
             .WithErrorCode(ModuleSettingExceptionCodes.InvalidIdempotencyTtlSeconds);
+        RuleFor(input => input.FailedEventRetryWindowSeconds)
+            .InclusiveBetween(
+                EventBoxConsts.MinFailedEventRetryWindowSeconds,
+                EventBoxConsts.MaxFailedEventRetryWindowSeconds)
+            .WithErrorCode(ModuleSettingExceptionCodes.InvalidFailedEventRetryWindowSeconds);
     }
 }

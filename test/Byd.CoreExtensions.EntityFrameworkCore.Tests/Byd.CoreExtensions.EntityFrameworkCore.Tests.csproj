@@ -12,6 +12,9 @@
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Proxies" Version="10.0.2" />
     <PackageReference Include="SQLitePCLRaw.bundle_e_sqlite3" Version="2.1.12" />
+    <!-- Test host SQLite kullanir; EFCore.BulkExtensions saglayici adaptorunu calisma aninda
+         yansimayla cozdugu icin SQLite adaptoru burada da referanslanmalidir. -->
+    <PackageReference Include="EFCore.BulkExtensions.Sqlite" Version="10.0.0" />
     <ProjectReference Include="..\..\src\Byd.CoreExtensions.EntityFrameworkCore\Byd.CoreExtensions.EntityFrameworkCore.csproj" />
     <ProjectReference Include="..\Byd.CoreExtensions.Application.Tests\Byd.CoreExtensions.Application.Tests.csproj" />
     <PackageReference Include="Volo.Abp.EntityFrameworkCore.Sqlite" Version="10.3.0" />

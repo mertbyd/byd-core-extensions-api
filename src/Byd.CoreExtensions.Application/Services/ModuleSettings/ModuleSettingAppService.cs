@@ -47,6 +47,12 @@ public class ModuleSettingAppService : CoreExtensionsAppService, IModuleSettingA
         var entity = await Manager.EnsureExistsAsync(id, CancellationTokenProvider.Token);
         return Mapper.MapIdempotency(entity);
     }
+    // Kimligi verilen modul ayarinin yalniz olay kutusu alanlarini getirir.
+    public virtual async Task<ModuleSettingEventBoxDto> GetEventBoxAsync(Guid id)
+    {
+        var entity = await Manager.EnsureExistsAsync(id, CancellationTokenProvider.Token);
+        return Mapper.MapEventBox(entity);
+    }
     // Tum modul ayarlarini detay iliskisi yuklemeden repository'den getirir.
     public virtual async Task<List<ModuleSettingDto>> GetListAsync()
     {

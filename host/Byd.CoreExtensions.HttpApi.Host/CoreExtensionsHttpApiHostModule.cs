@@ -43,10 +43,13 @@ public class CoreExtensionsHttpApiHostModule : AbpModule
     {
         // Bu host'un ModuleSettings satir adi ve anti-duplicate muafiyetleri; beyan zorunludur.
         // Satir adi giris assembly'sinin adindan host son eki atilarak turetilir.
+        // Ortam adi barindirma ortamindan okunur; olay kutusu kayitlarinin sahiplik kapsamini bu beyan ayirir.
+        var environmentName = context.Services.GetHostingEnvironment().EnvironmentName;
         Configure<CoreExtensionsModuleOptions>(options =>
         {
             options.ModuleName = Assembly.GetEntryAssembly()?.GetName().Name?
                 .Replace(".HttpApi.Host", string.Empty);
+            options.EnvironmentName = environmentName;
         });
         context.Services.AddAbpSwaggerGen(options =>
         {

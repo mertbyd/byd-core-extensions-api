@@ -78,5 +78,8 @@ public class ModuleSettingManager : BaseManager<ModuleSetting, Guid>
         entity.RateLimitWindowSeconds = model.RateLimitWindowSeconds;
         entity.IdempotencyEnabled = model.IdempotencyEnabled;
         entity.IdempotencyTtlSeconds = model.IdempotencyTtlSeconds;
+        entity.EventBoxEnabled = model.EventBoxEnabled;
+        entity.FailedEventRetryUnlimited = model.FailedEventRetryUnlimited;
+        entity.FailedEventRetryWindowSeconds = model.FailedEventRetryWindowSeconds;
     }
 }

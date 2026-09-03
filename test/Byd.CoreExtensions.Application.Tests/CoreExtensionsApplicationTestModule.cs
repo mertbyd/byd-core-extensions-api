@@ -1,4 +1,5 @@
-﻿using Volo.Abp.Modularity;
+﻿using Byd.CoreExtensions.Options;
+using Volo.Abp.Modularity;
 
 namespace Byd.CoreExtensions;
 
@@ -8,5 +9,13 @@ namespace Byd.CoreExtensions;
     )]
 public class CoreExtensionsApplicationTestModule : AbpModule
 {
-
+    // Test host'u da gercek host gibi modul ve ortam adini beyan eder; beyan olmadan modul ayaga kalkmaz.
+    public override void ConfigureServices(ServiceConfigurationContext context)
+    {
+        Configure<CoreExtensionsModuleOptions>(options =>
+        {
+            options.ModuleName = "CoreExtensions";
+            options.EnvironmentName = "Test";
+        });
+    }
 }

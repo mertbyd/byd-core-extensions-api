@@ -22,6 +22,9 @@ public interface IModuleSettingAppService : IApplicationService
     // Kimligi verilen modul ayarinin yalniz idempotency alanlarini getirir.
     Task<ModuleSettingIdempotencyDto> GetIdempotencyAsync(Guid id);
 
+    // Kimligi verilen modul ayarinin yalniz olay kutusu alanlarini getirir.
+    Task<ModuleSettingEventBoxDto> GetEventBoxAsync(Guid id);
+
     // Tum modul ayari kayitlarini getirir.
     Task<List<ModuleSettingDto>> GetListAsync();
 

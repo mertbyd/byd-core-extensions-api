@@ -260,3 +260,6 @@ host/Byd.CoreExtensions.Blazor.Server.Host/Logs/logs.txt
 
 # Use abp install-libs to restore.
 **/wwwroot/libs/*
+
+# Playwright MCP gecici ciktilari
+.playwright-mcp/

@@ -19,4 +19,6 @@ public static class ModuleSettingExceptionCodes
     public const string InvalidIdempotencyTtlSeconds = Prefix + ":00007";
     public const string ModuleNameNotConfigured = Prefix + ":00008";
     public const string PipelineNotConfigured = Prefix + ":00009";
+    public const string InvalidFailedEventRetryWindowSeconds = Prefix + ":00010";
+    public const string EnvironmentNameNotConfigured = Prefix + ":00011";
 }
