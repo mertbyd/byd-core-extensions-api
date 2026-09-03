@@ -9,6 +9,9 @@ public class CoreExtensionsModuleOptions
 {
     // Bu host'un ModuleSettings tablosundaki satir adi; beyan edilmezse cozumleme acilista hata verir.
     public string? ModuleName { get; set; }
+    // Bu host'un calistigi ortam adi; olay kutusu kayitlarinin sahiplik kapsamini ayirir.
+    // Ayni sema uzerinde birden fazla ortam calisirken kayitlarin karismamasini saglar.
+    public string? EnvironmentName { get; set; }
     // Anti-duplicate korumasi disinda tutulacak beyanlar; bos birakilirsa hicbir istek muaf degildir.
     // Bir beyan iki seyden biri olabilir:
     //   HTTP metodu  -> "/get" veya "get" o metotla gelen tum istekleri disarida birakir;
