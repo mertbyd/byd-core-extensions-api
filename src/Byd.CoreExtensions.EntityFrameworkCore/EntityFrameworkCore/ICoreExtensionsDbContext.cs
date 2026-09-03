@@ -2,6 +2,7 @@ using Volo.Abp.Data;
 using Volo.Abp.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Byd.CoreExtensions.Entities;
+using Byd.CoreExtensions.Entities.EventBus;
 using Byd.CoreExtensions.Entities.ModuleSettings;
 
 namespace Byd.CoreExtensions.EntityFrameworkCore;
@@ -15,4 +16,6 @@ public interface ICoreExtensionsDbContext : IEfCoreDbContext
     DbSet<ModuleSetting> ModuleSettings { get; }
 
     DbSet<ApiKey> ApiKeys { get; }
+
+    DbSet<FailedEventInbox> FailedEventInboxes { get; }
 }
