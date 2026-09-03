@@ -57,6 +57,17 @@ public class ModuleSettingController : CoreExtensionsController//todo : auth mod
         return result;
     }
     /// <summary>
+    /// Kimligi verilen modul ayari kaydinin olay kutusu alanlarini getirir.
+    /// </summary>
+    /// <param name="id">Olay kutusu alanlari okunacak modul ayari kaydinin benzersiz kimligi.</param>
+    /// <returns>Modul anahtarlari ve olay kutusu ayarlarini iceren cevap.</returns>
+    [HttpGet(ModuleSettingRoutes.EventBoxById)]
+    public virtual async Task<Result<ModuleSettingEventBoxDto>> GetEventBox(Guid id)
+    {
+        var result = await AppService.GetEventBoxAsync(id);
+        return result;
+    }
+    /// <summary>
     /// Kayitli tum modul ayarlarini tek listede getirir.
     /// Liste sayfalanmaz; tablo her modul icin tek satir tutan kucuk bir yapilandirma kayit defteridir.
     /// </summary>

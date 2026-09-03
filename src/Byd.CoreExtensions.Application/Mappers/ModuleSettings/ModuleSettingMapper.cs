@@ -19,5 +19,6 @@ public partial class ModuleSettingMapper
     public partial ModuleSettingDto Map(ModuleSetting source);
     public partial ModuleSettingRateLimitDto MapRateLimit(ModuleSetting source);
     public partial ModuleSettingIdempotencyDto MapIdempotency(ModuleSetting source);
+    public partial ModuleSettingEventBoxDto MapEventBox(ModuleSetting source);
     public partial List<ModuleSettingDto> Map(List<ModuleSetting> source);
 }

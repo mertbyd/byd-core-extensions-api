@@ -10,6 +10,9 @@ public sealed class ModuleSettingCacheModel
     public bool IsEnabled { get; set; }
     public bool IdempotencyEnabled { get; set; }
     public int IdempotencyTtlSeconds { get; set; }
+    public bool EventBoxEnabled { get; set; }
+    public bool FailedEventRetryUnlimited { get; set; }
+    public int FailedEventRetryWindowSeconds { get; set; }
     public bool RateLimitEnabled { get; set; }
     public int RateLimitPermitLimit { get; set; }
     public int RateLimitWindowSeconds { get; set; }

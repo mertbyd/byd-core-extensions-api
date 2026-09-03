@@ -22,4 +22,8 @@ public abstract class ModuleSettingInputDto
     public int RateLimitWindowSeconds { get; set; } = ModuleSettingConsts.DefaultRateLimitWindowSeconds;
     public bool IdempotencyEnabled { get; set; }
     public int IdempotencyTtlSeconds { get; set; } = IdempotencyConsts.DefaultTtlSeconds;
+    public bool EventBoxEnabled { get; set; } = EventBoxConsts.DefaultEnabled;
+    public bool FailedEventRetryUnlimited { get; set; } = EventBoxConsts.DefaultFailedEventRetryUnlimited;
+    public int FailedEventRetryWindowSeconds { get; set; }
+        = EventBoxConsts.DefaultFailedEventRetryWindowSeconds;
 }

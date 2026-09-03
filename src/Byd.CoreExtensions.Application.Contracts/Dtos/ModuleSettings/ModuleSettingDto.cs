@@ -19,5 +19,8 @@ public class ModuleSettingDto
     public int RateLimitWindowSeconds { get; set; }
     public bool IdempotencyEnabled { get; set; }
     public int IdempotencyTtlSeconds { get; set; }
+    public bool EventBoxEnabled { get; set; }
+    public bool FailedEventRetryUnlimited { get; set; }
+    public int FailedEventRetryWindowSeconds { get; set; }
     public DateTime? LastModificationTime { get; set; }
 }

@@ -5,9 +5,9 @@ using Volo.Abp.Domain.Entities.Auditing;
 namespace Byd.CoreExtensions.Entities.ModuleSettings;
 
 /// <summary>
-/// Bir modulun merkezi calisma, rate limit ve idempotency ayarlarini tasir.
+/// Bir modulun merkezi calisma, rate limit, idempotency ve olay kutusu ayarlarini tasir.
 /// </summary>
-// islevi: Modul bazli etkinlik, TTL, rate limit ve idempotency alanlarini audited aggregate olarak kalici tutar.
+// islevi: Modul bazli etkinlik, TTL, rate limit, idempotency ve olay kutusu alanlarini audited aggregate olarak kalici tutar.
 // sistemdeki gorevi: Is kurallarini ModuleSettingManager'a birakan veri kabugudur. Satirin kimligi ModuleName ile TenantId bilesimidir; ayni modulun host satiri ile tenant satiri yan yana yasar.
 public class ModuleSetting : AuditedAggregateRoot<Guid>
 {
@@ -25,6 +25,10 @@ public class ModuleSetting : AuditedAggregateRoot<Guid>
     public int RateLimitWindowSeconds { get; internal set; } = ModuleSettingConsts.DefaultRateLimitWindowSeconds;
     public bool IdempotencyEnabled { get; internal set; }
     public int IdempotencyTtlSeconds { get; internal set; } = IdempotencyConsts.DefaultTtlSeconds;
+    public bool EventBoxEnabled { get; internal set; }
+    public bool FailedEventRetryUnlimited { get; internal set; }
+    public int FailedEventRetryWindowSeconds { get; internal set; }
+        = EventBoxConsts.DefaultFailedEventRetryWindowSeconds;
 
     // EF Core materializasyonu icin parametresiz ctor.
     protected ModuleSetting()
