@@ -6,6 +6,7 @@ using Volo.Abp.EntityFrameworkCore;
 using Volo.Abp.EntityFrameworkCore.DistributedEvents;
 using Volo.Abp.SettingManagement.EntityFrameworkCore;
 using Byd.CoreExtensions.Entities;
+using Byd.CoreExtensions.Extensions;
 
 namespace Byd.CoreExtensions.EntityFrameworkCore;
 
@@ -42,9 +43,8 @@ public class CoreExtensionsDbContext : AbpDbContext<CoreExtensionsDbContext>, IC
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
-
         builder.ConfigureSettingManagement();
-
         builder.ConfigureCoreExtensions();
+        builder.ApplySnakeCaseNaming();
     }
 }

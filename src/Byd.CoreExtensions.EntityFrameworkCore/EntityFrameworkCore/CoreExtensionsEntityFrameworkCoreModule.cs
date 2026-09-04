@@ -25,7 +25,6 @@ public class CoreExtensionsEntityFrameworkCoreModule : AbpModule
             options.Configure(configurationContext =>
             {
                 configurationContext.UseNpgsql();
-                configurationContext.DbContextOptions.UseSnakeCaseNamingConvention();
             });
         });
 
