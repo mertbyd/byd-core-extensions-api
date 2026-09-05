@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Byd.CoreExtensions.Interfaces;
 using Volo.Abp.Domain.Entities;
 using Volo.Abp.Domain.Entities.Events;
+using Volo.Abp.DependencyInjection;
 using Volo.Abp.Domain.Repositories;
 
 namespace Byd.CoreExtensions.Interfaces;
@@ -15,7 +16,7 @@ namespace Byd.CoreExtensions.Interfaces;
 /// </summary>
 // islevi: Nadiren degisen kayitlari cache modeli olarak saklar, okuma sorgularini veritabanina gitmeden karsilar ve kayit degistiginde cache'i tazeler.
 // sistemdeki gorevi: Lookup benzeri tablolarin okuma yolu; ABP'nin dagitik cache altyapisini kullanir, uzerine "komple yukle, bellekten sorgula, degisince temizle" desenini ekler.
-public interface ICachedRepository<TEntity, TCacheModel> : IRepository<TEntity>
+public interface ICachedRepository<TEntity, TCacheModel> : IRepository<TEntity>, IScopedDependency
     where TEntity : class, IEntity
     where TCacheModel : class, ICacheModel, IEntity
 {
