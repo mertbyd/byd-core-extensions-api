@@ -6,6 +6,24 @@
     <AbpProjectType>module</AbpProjectType>
   </PropertyGroup>
 
+  <!-- NuGet paket kimlik bilgileri. Paket kimligi proje adidir; her katman kendi adiyla yayinlanir. -->
+  <PropertyGroup>
+    <Authors>mertbyd</Authors>
+    <Company>Mert Ali Baydemir</Company>
+    <Product>Byd.CoreExtensions</Product>
+    <Description>Byd.CoreExtensions core modul katmani.</Description>
+    <RepositoryUrl>https://github.com/mertbyd/byd-core-extensions-api.git</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageProjectUrl>https://github.com/mertbyd/byd-core-extensions-api</PackageProjectUrl>
+    <Deterministic>true</Deterministic>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+  </PropertyGroup>
+
+  <!-- Kok README her pakete gomulur; yalnizca paketlenen projelerde etki eder. -->
+  <ItemGroup>
+    <None Include="$(MSBuildThisFileDirectory)README.md" Pack="true" PackagePath="\" Visible="false" />
+  </ItemGroup>
+
   <ItemGroup>
     <PackageReference Include="ConfigureAwait.Fody" Version="3.3.1" PrivateAssets="All" />
     <PackageReference Include="Fody" Version="6.5.3">
