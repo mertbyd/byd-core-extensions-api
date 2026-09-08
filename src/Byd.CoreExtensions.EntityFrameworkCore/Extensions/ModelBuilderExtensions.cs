@@ -25,6 +25,17 @@ public static class ModelBuilderExtensions
 
         foreach (var entityType in model.GetEntityTypes())
         {
+            // JSON'a eslenen sahipli tipin fiziksel karsiligi bir tablo degil, sahibinin tablosundaki
+            // tek bir kolondur. Tablo adi yazilirsa sahiple ayrisir ve model kurulumu durur
+            // ("Every entity mapped to JSON must also map to the same table or view as its owner");
+            // kolon adi yazilirsa EF bunu JSON ozellik adiyla catisma sayar. Cevrilecek tek ad,
+            // JSON belgesini tutan kolonun adidir. EFCore.NamingConventions da ayni ayrimi yapar.
+            if (entityType.IsMappedToJson())
+            {
+                RewriteContainerColumnName(entityType);
+                continue;
+            }
+
             RewriteStorageNames(entityType);
             RewriteColumnNames(entityType);
             RewriteConstraintNames(entityType);
@@ -47,6 +58,14 @@ public static class ModelBuilderExtensions
 
         Rewrite(convention.GetViewSchemaConfigurationSource(),
             () => entityType.GetViewSchema(), name => entityType.SetViewSchema(name));
+    }
+
+    // JSON belgesini tutan kolonun adini cevirir; JSON'a eslenen tipin tek fiziksel adi budur.
+    private static void RewriteContainerColumnName(IMutableEntityType entityType)
+    {
+        Rewrite(((IConventionEntityType)entityType).GetContainerColumnNameConfigurationSource(),
+            () => entityType.GetContainerColumnName(),
+            name => entityType.SetContainerColumnName(name));
     }
 
     // Entity'nin kolon adlarini cevirir.
