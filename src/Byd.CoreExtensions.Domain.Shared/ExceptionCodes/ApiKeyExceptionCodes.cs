@@ -9,21 +9,18 @@ namespace Byd.CoreExtensions.ExceptionCodes;
 // sistemdeki gorevi: API anahtari filtresinin ve validator'larinin urettigi hata yanitlarinin ve localization kayitlarinin ortak anahtar kaynagi.
 public static class ApiKeyExceptionCodes
 {
-    // Tum API anahtari kodlarinin ortak on eki; gramer "<Kok>.ApiKey:<sira>" seklindedir.
-    public const string Prefix = ExceptionCodeConsts.RootNamespace + ".ApiKey";
-
     // Istekte API anahtari header'i hic gonderilmedi.
-    public const string MissingApiKey = Prefix + ":00001";
+    public const string MissingApiKey = ExceptionCodeConsts.ApiKeyGroup + "0001";
 
     // Gonderilen anahtar bilinen hicbir kayitla eslesmiyor.
-    public const string InvalidApiKey = Prefix + ":00002";
+    public const string InvalidApiKey = ExceptionCodeConsts.ApiKeyGroup + "0002";
 
     // Anahtarin gecerlilik suresi dolmus.
-    public const string ExpiredApiKey = Prefix + ":00004";
+    public const string ExpiredApiKey = ExceptionCodeConsts.ApiKeyGroup + "0004";
 
     // Anahtar adi bos gonderildi.
-    public const string NameRequired = Prefix + ":00005";
+    public const string NameRequired = ExceptionCodeConsts.ApiKeyGroup + "0005";
 
     // Anahtar adi izin verilen uzunlugu asiyor.
-    public const string NameTooLong = Prefix + ":00006";
+    public const string NameTooLong = ExceptionCodeConsts.ApiKeyGroup + "0006";
 }
