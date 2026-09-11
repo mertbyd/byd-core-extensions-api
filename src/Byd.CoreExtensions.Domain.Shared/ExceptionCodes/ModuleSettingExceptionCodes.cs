@@ -9,16 +9,15 @@ namespace Byd.CoreExtensions.ExceptionCodes;
 // sistemdeki gorevi: Validator, localization ve ilerideki istemciler icin tek hata sozlesmesi sahibidir.
 public static class ModuleSettingExceptionCodes
 {
-    public const string Prefix = ExceptionCodeConsts.RootNamespace + ".ModuleSetting";
-    public const string ModuleNameRequired = Prefix + ":00001";
-    public const string ModuleNameTooLong = Prefix + ":00002";
-    public const string DuplicateModuleName = Prefix + ":00003";
-    public const string InvalidTtlSeconds = Prefix + ":00004";
-    public const string InvalidRateLimitPermitLimit = Prefix + ":00005";
-    public const string InvalidRateLimitWindowSeconds = Prefix + ":00006";
-    public const string InvalidIdempotencyTtlSeconds = Prefix + ":00007";
-    public const string ModuleNameNotConfigured = Prefix + ":00008";
-    public const string PipelineNotConfigured = Prefix + ":00009";
-    public const string InvalidFailedEventRetryWindowSeconds = Prefix + ":00010";
-    public const string EnvironmentNameNotConfigured = Prefix + ":00011";
+    public const string ModuleNameRequired = ExceptionCodeConsts.ModuleSettingGroup + "0001";
+    public const string ModuleNameTooLong = ExceptionCodeConsts.ModuleSettingGroup + "0002";
+    public const string DuplicateModuleName = ExceptionCodeConsts.ModuleSettingGroup + "0003";
+    public const string InvalidTtlSeconds = ExceptionCodeConsts.ModuleSettingGroup + "0004";
+    public const string InvalidRateLimitPermitLimit = ExceptionCodeConsts.ModuleSettingGroup + "0005";
+    public const string InvalidRateLimitWindowSeconds = ExceptionCodeConsts.ModuleSettingGroup + "0006";
+    public const string InvalidIdempotencyTtlSeconds = ExceptionCodeConsts.ModuleSettingGroup + "0007";
+    public const string ModuleNameNotConfigured = ExceptionCodeConsts.ModuleSettingGroup + "0008";
+    public const string PipelineNotConfigured = ExceptionCodeConsts.ModuleSettingGroup + "0009";
+    public const string InvalidFailedEventRetryWindowSeconds = ExceptionCodeConsts.ModuleSettingGroup + "0010";
+    public const string EnvironmentNameNotConfigured = ExceptionCodeConsts.ModuleSettingGroup + "0011";
 }

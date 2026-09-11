@@ -263,3 +263,6 @@ host/Byd.CoreExtensions.Blazor.Server.Host/Logs/logs.txt
 
 # Playwright MCP gecici ciktilari
 .playwright-mcp/
+
+# Local development configuration; her gelistirici kendi baglanti bilgisini tutar.
+host/**/appsettings.Development.json

@@ -9,35 +9,33 @@ namespace Byd.CoreExtensions.ExceptionCodes;
 // sistemdeki gorevi: BusinessException'larin ve localization kayitlarinin ortak anahtar kaynagi; konuya ozel kodlar kendi ExceptionCodes ailesinde yasar.
 public static class GeneralExceptionCodes
 {
-    // Tum genel kodlarin ortak on eki; gramer "<Modul>.<Konu>:<sira>" seklindedir.
-    public const string Prefix = ExceptionCodeConsts.RootNamespace + ".General";
     // Baska kayitlarla iliskili oldugu icin silinemeyen veri.
-    public const string RelationalDataDelete = Prefix + ":00001";
+    public const string RelationalDataDelete = ExceptionCodeConsts.GeneralGroup + "0001";
 
     // Filtre isteginde taninmayan operator belirteci gonderildi.
-    public const string UnsupportedFilterOperator = Prefix + ":00002";
+    public const string UnsupportedFilterOperator = ExceptionCodeConsts.GeneralGroup + "0002";
 
     // Filtre degeri hedef CLR tipine donusturulemedi.
-    public const string InvalidFilterValue = Prefix + ":00003";
+    public const string InvalidFilterValue = ExceptionCodeConsts.GeneralGroup + "0003";
 
     // Sayfa numarasi desteklenen araligin disinda gonderildi.
-    public const string InvalidPage = Prefix + ":00004";
+    public const string InvalidPage = ExceptionCodeConsts.GeneralGroup + "0004";
 
     // Sayfa boyutu desteklenen araligin disinda gonderildi.
-    public const string InvalidPageSize = Prefix + ":00005";
+    public const string InvalidPageSize = ExceptionCodeConsts.GeneralGroup + "0005";
 
     // Predicate ile aranan kayit veritabaninda bulunamadi.
-    public const string EntityNotFound = Prefix + ":00006";
+    public const string EntityNotFound = ExceptionCodeConsts.GeneralGroup + "0006";
 
     // Ayni degerlere sahip bir kayit zaten var oldugu icin islem yapilamadi.
-    public const string AlreadyExists = Prefix + ":00007";
+    public const string AlreadyExists = ExceptionCodeConsts.GeneralGroup + "0007";
 
     // Zorunlu bir alan bos birakildi.
-    public const string RequiredValueMissing = Prefix + ":00008";
+    public const string RequiredValueMissing = ExceptionCodeConsts.GeneralGroup + "0008";
 
     // Enum alanina tanimli olmayan bir deger gonderildi.
-    public const string InvalidEnumValue = Prefix + ":00009";
+    public const string InvalidEnumValue = ExceptionCodeConsts.GeneralGroup + "0009";
 
     // Rate limit asildi; istemci pencere/kota dolduktan sonra yeniden denemelidir.
-    public const string TooManyRequests = Prefix + ":00010";
+    public const string TooManyRequests = ExceptionCodeConsts.GeneralGroup + "0010";
 }

@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Volo.Abp.Domain.Entities;
+using Volo.Abp.DependencyInjection;
 using Volo.Abp.Domain.Repositories;
 
 namespace Byd.CoreExtensions.Interfaces;
@@ -11,7 +12,7 @@ namespace Byd.CoreExtensions.Interfaces;
 /// </summary>
 // islevi: Coklu kayit ekleme, guncelleme ve silme islemlerini degisiklik takipcisini kullanmadan, kume tabanli tek islemde yapmayi taahhut eder.
 // sistemdeki gorevi: ABP'nin satir bazli InsertMany/UpdateMany/DeleteMany metotlarinin olcek yetersiz kaldigi senaryolarin sozlesmesi; uygulama saglayiciya ozgu toplu yazma yolunu kullanir.
-public interface IBulkRepository<TEntity> : IRepository<TEntity>
+public interface IBulkRepository<TEntity> : IRepository<TEntity>, IScopedDependency
     where TEntity : class, IEntity
 {
     // Verilen kayitlari toplu olarak ekler; batchSize bos birakilirsa BulkOperationConsts.DefaultBatchSize kullanilir.
