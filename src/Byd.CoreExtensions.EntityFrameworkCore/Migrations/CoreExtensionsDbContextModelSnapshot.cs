@@ -32,11 +32,11 @@ namespace Byd.CoreExtensions.Migrations
 
                     b.Property<DateTime>("CreationTime")
                         .HasColumnType("timestamp with time zone")
-                        .HasColumnName("CreationTime");
+                        .HasColumnName("creation_time");
 
                     b.Property<Guid?>("CreatorId")
                         .HasColumnType("uuid")
-                        .HasColumnName("CreatorId");
+                        .HasColumnName("creator_id");
 
                     b.Property<DateTime?>("ExpiresAt")
                         .HasColumnType("timestamp with time zone")
@@ -85,15 +85,15 @@ namespace Byd.CoreExtensions.Migrations
                         .IsRequired()
                         .HasMaxLength(40)
                         .HasColumnType("character varying(40)")
-                        .HasColumnName("ConcurrencyStamp");
+                        .HasColumnName("concurrency_stamp");
 
                     b.Property<DateTime>("CreationTime")
                         .HasColumnType("timestamp with time zone")
-                        .HasColumnName("CreationTime");
+                        .HasColumnName("creation_time");
 
                     b.Property<Guid?>("CreatorId")
                         .HasColumnType("uuid")
-                        .HasColumnName("CreatorId");
+                        .HasColumnName("creator_id");
 
                     b.Property<byte[]>("EventData")
                         .IsRequired()
@@ -118,7 +118,7 @@ namespace Byd.CoreExtensions.Migrations
                     b.Property<string>("ExtraProperties")
                         .IsRequired()
                         .HasColumnType("text")
-                        .HasColumnName("ExtraProperties");
+                        .HasColumnName("extra_properties");
 
                     b.Property<bool>("IsProcessed")
                         .HasColumnType("boolean")
@@ -126,11 +126,11 @@ namespace Byd.CoreExtensions.Migrations
 
                     b.Property<DateTime?>("LastModificationTime")
                         .HasColumnType("timestamp with time zone")
-                        .HasColumnName("LastModificationTime");
+                        .HasColumnName("last_modification_time");
 
                     b.Property<Guid?>("LastModifierId")
                         .HasColumnType("uuid")
-                        .HasColumnName("LastModifierId");
+                        .HasColumnName("last_modifier_id");
 
                     b.Property<string>("MessageId")
                         .IsRequired()
@@ -187,15 +187,15 @@ namespace Byd.CoreExtensions.Migrations
                         .IsRequired()
                         .HasMaxLength(40)
                         .HasColumnType("character varying(40)")
-                        .HasColumnName("ConcurrencyStamp");
+                        .HasColumnName("concurrency_stamp");
 
                     b.Property<DateTime>("CreationTime")
                         .HasColumnType("timestamp with time zone")
-                        .HasColumnName("CreationTime");
+                        .HasColumnName("creation_time");
 
                     b.Property<Guid?>("CreatorId")
                         .HasColumnType("uuid")
-                        .HasColumnName("CreatorId");
+                        .HasColumnName("creator_id");
 
                     b.Property<bool>("EventBoxEnabled")
                         .HasColumnType("boolean")
@@ -204,7 +204,7 @@ namespace Byd.CoreExtensions.Migrations
                     b.Property<string>("ExtraProperties")
                         .IsRequired()
                         .HasColumnType("text")
-                        .HasColumnName("ExtraProperties");
+                        .HasColumnName("extra_properties");
 
                     b.Property<bool>("FailedEventRetryUnlimited")
                         .HasColumnType("boolean")
@@ -232,11 +232,11 @@ namespace Byd.CoreExtensions.Migrations
 
                     b.Property<DateTime?>("LastModificationTime")
                         .HasColumnType("timestamp with time zone")
-                        .HasColumnName("LastModificationTime");
+                        .HasColumnName("last_modification_time");
 
                     b.Property<Guid?>("LastModifierId")
                         .HasColumnType("uuid")
-                        .HasColumnName("LastModifierId");
+                        .HasColumnName("last_modifier_id");
 
                     b.Property<string>("ModuleName")
                         .IsRequired()
@@ -290,7 +290,7 @@ namespace Byd.CoreExtensions.Migrations
 
                     b.Property<DateTime>("CreationTime")
                         .HasColumnType("timestamp with time zone")
-                        .HasColumnName("CreationTime");
+                        .HasColumnName("creation_time");
 
                     b.Property<byte[]>("EventData")
                         .IsRequired()
@@ -306,7 +306,7 @@ namespace Byd.CoreExtensions.Migrations
                     b.Property<string>("ExtraProperties")
                         .IsRequired()
                         .HasColumnType("text")
-                        .HasColumnName("ExtraProperties");
+                        .HasColumnName("extra_properties");
 
                     b.Property<DateTime?>("HandledTime")
                         .HasColumnType("timestamp with time zone")
@@ -361,7 +361,7 @@ namespace Byd.CoreExtensions.Migrations
 
                     b.Property<DateTime>("CreationTime")
                         .HasColumnType("timestamp with time zone")
-                        .HasColumnName("CreationTime");
+                        .HasColumnName("creation_time");
 
                     b.Property<byte[]>("EventData")
                         .IsRequired()
@@ -377,7 +377,7 @@ namespace Byd.CoreExtensions.Migrations
                     b.Property<string>("ExtraProperties")
                         .IsRequired()
                         .HasColumnType("text")
-                        .HasColumnName("ExtraProperties");
+                        .HasColumnName("extra_properties");
 
                     b.HasKey("Id")
                         .HasName("pk_event_outbox");

@@ -68,13 +68,16 @@ public static class ModelBuilderExtensions
             name => entityType.SetContainerColumnName(name));
     }
 
-    // Entity'nin kolon adlarini cevirir.
+    // Entity'nin kolon adlarini cevirir. ABP ConfigureByConvention audit, tenant ve genisletme kolonlarina property adini
+    // elle verir; property adinin aynisi olan ad konvansiyon adi sayilir ve o da cevrilir, ozel verilen ad korunur.
     private static void RewriteColumnNames(IMutableEntityType entityType)
     {
         foreach (var property in entityType.GetProperties())
         {
-            Rewrite(((IConventionProperty)property).GetColumnNameConfigurationSource(),
-                () => property.GetColumnName(), name => property.SetColumnName(name));
+            var source = property.GetColumnName() == property.Name
+                ? ConfigurationSource.Convention
+                : ((IConventionProperty)property).GetColumnNameConfigurationSource();
+            Rewrite(source, () => property.GetColumnName(), name => property.SetColumnName(name));
         }
     }
 
