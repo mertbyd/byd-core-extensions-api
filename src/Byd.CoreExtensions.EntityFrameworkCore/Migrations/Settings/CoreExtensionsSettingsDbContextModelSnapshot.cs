@@ -88,7 +88,7 @@ namespace Byd.CoreExtensions.Migrations.Settings
 
                     b.Property<string>("ExtraProperties")
                         .HasColumnType("text")
-                        .HasColumnName("ExtraProperties");
+                        .HasColumnName("extra_properties");
 
                     b.Property<bool>("IsEncrypted")
                         .HasColumnType("boolean")
