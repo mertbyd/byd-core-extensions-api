@@ -1,10 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 using Volo.Abp.EntityFrameworkCore;
-using Volo.Abp.EntityFrameworkCore.DistributedEvents;
 using Volo.Abp.EntityFrameworkCore.PostgreSql;
-using Volo.Abp.EventBus.Distributed;
 using Volo.Abp.Modularity;
 using Volo.Abp.SettingManagement.EntityFrameworkCore;
 
@@ -52,5 +49,7 @@ public class CoreExtensionsEntityFrameworkCoreModule : AbpModule
              * options.AddRepository<Question, EfCoreQuestionRepository>();
              */
         });
+
+        context.Services.AddCoreExtensionsEventBoxes();
     }
 }

@@ -12,6 +12,7 @@
     <PackageReference Include="Volo.Abp.Mapperly" Version="10.3.0" />
     <PackageReference Include="Volo.Abp.Ddd.Application" Version="10.3.0" />
     <PackageReference Include="Volo.Abp.BackgroundWorkers" Version="10.3.0" />
+    <PackageReference Include="Volo.Abp.EventBus.RabbitMQ" Version="10.3.0" />
     <PackageReference Include="Volo.Abp.Caching" Version="10.3.0" />
     <ProjectReference Include="..\Byd.AntiDuplicate.Middleware\Byd.AntiDuplicate.Middleware.csproj" />
     <ProjectReference Include="..\Byd.CoreExtensions.Application.Contracts\Byd.CoreExtensions.Application.Contracts.csproj" />

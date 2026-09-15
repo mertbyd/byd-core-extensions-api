@@ -13,6 +13,7 @@ using Volo.Abp.BackgroundWorkers;
 using Volo.Abp.Caching;
 using Volo.Abp.DependencyInjection;
 using Volo.Abp.EventBus.Distributed;
+using Volo.Abp.EventBus.RabbitMq;
 using Volo.Abp.Mapperly;
 using Volo.Abp.Modularity;
 namespace Byd.CoreExtensions;
@@ -21,7 +22,7 @@ namespace Byd.CoreExtensions;
 /// Application katmaninin modul kompozisyonunu ve calisma zamani kayitlarini kurar.
 /// </summary>
 // islevi: Application katmaninin ABP modul kompozisyonunu ve servis kayitlarini kurar.
-// sistemdeki gorevi: Korumalari kaydeder, host'un modulu pipeline'ina bagladigini acilista dogrular ve arka plan iscilerini devreye alir. Ayar satirini yazma isi host'un cagirdigi UseCoreExtensions uzantisina aittir.
+// sistemdeki gorevi: Korumalari kaydeder, host'un modulu pipeline'ina bagladigini acilista dogrular ve arka plan iscilerini devreye alir. Ayar satirini yazma isi host'un cagirdigi UseCoreExtensions uzantisina aittir. Dagitik olaylar RabbitMQ uzerinden tasinir; baglanti bilgisi host'un RabbitMQ bolumunden gelir.
 [DependsOn(
     typeof(BydAntiDuplicateMiddlewareModule),
     typeof(CoreExtensionsDomainModule),
@@ -29,7 +30,8 @@ namespace Byd.CoreExtensions;
     typeof(AbpDddApplicationModule),
     typeof(AbpCachingModule),
     typeof(AbpMapperlyModule),
-    typeof(AbpBackgroundWorkersModule)
+    typeof(AbpBackgroundWorkersModule),
+    typeof(AbpEventBusRabbitMqModule)
     )]
 public class CoreExtensionsApplicationModule : AbpModule
 {
