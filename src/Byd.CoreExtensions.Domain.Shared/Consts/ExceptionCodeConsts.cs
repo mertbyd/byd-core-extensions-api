@@ -29,4 +29,7 @@ public static class ExceptionCodeConsts
 
     // Modul ayari akisi.
     public const string ModuleSettingGroup = RootNamespace + ":04";
+
+    // Redis baglantisi.
+    public const string RedisGroup = RootNamespace + ":05";
 }

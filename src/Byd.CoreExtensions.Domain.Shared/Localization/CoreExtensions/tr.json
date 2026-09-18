@@ -28,6 +28,7 @@
     "CoreExtensions:020004": "Gönderilen API anahtarının süresi dolmuş.",
     "CoreExtensions:020005": "API anahtari adi zorunludur.",
     "CoreExtensions:020006": "API anahtari adi 128 karakterden uzun olamaz.",
-    "CoreExtensions:030001": "Ayni istek daha once gonderildi. Yeniden denemeden once lutfen bekleyin."
+    "CoreExtensions:030001": "Ayni istek daha once gonderildi. Yeniden denemeden once lutfen bekleyin.",
+    "CoreExtensions:050001": "Host Redis baglantisini acmadi ya da adresini beyan etmedi."
   }
 }

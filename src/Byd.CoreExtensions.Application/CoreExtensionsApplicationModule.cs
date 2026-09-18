@@ -7,6 +7,7 @@ using Byd.CoreExtensions.Consts;
 using Byd.CoreExtensions.EventBus;
 using Byd.CoreExtensions.ExceptionCodes;
 using Byd.CoreExtensions.RateLimiting;
+using Byd.CoreExtensions.Redis;
 using Volo.Abp;
 using Volo.Abp.Application;
 using Volo.Abp.BackgroundWorkers;
@@ -22,7 +23,7 @@ namespace Byd.CoreExtensions;
 /// Application katmaninin modul kompozisyonunu ve calisma zamani kayitlarini kurar.
 /// </summary>
 // islevi: Application katmaninin ABP modul kompozisyonunu ve servis kayitlarini kurar.
-// sistemdeki gorevi: Korumalari kaydeder, host'un modulu pipeline'ina bagladigini acilista dogrular ve arka plan iscilerini devreye alir. Ayar satirini yazma isi host'un cagirdigi UseCoreExtensions uzantisina aittir. Dagitik olaylar RabbitMQ uzerinden tasinir; baglanti bilgisi host'un RabbitMQ bolumunden gelir.
+// sistemdeki gorevi: Korumalari kaydeder, host'un modulu pipeline'ina bagladigini acilista dogrular ve arka plan iscilerini devreye alir. Ayar satirini yazma isi host'un cagirdigi UseCoreExtensions uzantisina aittir. Dagitik olaylar RabbitMQ uzerinden tasinir; baglanti bilgisi host'un RabbitMQ bolumunden gelir. Paylasilan Redis baglantisi da host'un Redis bolumunden kurulur.
 [DependsOn(
     typeof(BydAntiDuplicateMiddlewareModule),
     typeof(CoreExtensionsDomainModule),
@@ -51,6 +52,7 @@ public class CoreExtensionsApplicationModule : AbpModule
         });
         context.Services.AddCoreExtensionsRateLimiter();
         context.Services.AddCoreExtensionsApiKeyValidation();
+        context.Services.AddCoreExtensionsRedis(context.Services.GetConfiguration());
         context.Services.AddMapperlyObjectMapper<CoreExtensionsApplicationModule>();
     }
     // Host'un beyanini dogrular ve tazeleme isciyi baslatir; beyan yoksa modulun acilisi burada durur.

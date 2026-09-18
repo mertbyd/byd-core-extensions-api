@@ -28,6 +28,7 @@
     "CoreExtensions:020004": "The provided API key has expired.",
     "CoreExtensions:020005": "API key name is required.",
     "CoreExtensions:020006": "API key name cannot exceed 128 characters.",
-    "CoreExtensions:030001": "The same request was already submitted. Please wait before retrying."
+    "CoreExtensions:030001": "The same request was already submitted. Please wait before retrying.",
+    "CoreExtensions:050001": "The host did not enable a Redis connection or did not declare its address."
   }
 }
