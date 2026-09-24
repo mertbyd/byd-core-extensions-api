@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using Byd.CoreExtensions.Dtos.EventBus;
 using Volo.Abp.Application.Services;
@@ -14,11 +15,15 @@ namespace Byd.CoreExtensions.Services.EventBus;
 public interface IFailedEventInboxAppService : IApplicationService
 {
     // Kimligi verilen basarisiz olay kaydini getirir.
-    Task<FailedEventInboxDto> GetAsync(Guid id);
+    Task<FailedEventInboxDto> GetAsync(Guid id, CancellationToken cancellationToken = default);
 
     // Filtre, siralama ve sayfalama uygulanmis basarisiz olay listesini getirir.
-    Task<List<FailedEventInboxDto>> GetFilteredListAsync(FailedEventInboxListInput input);
+    Task<List<FailedEventInboxDto>> GetFilteredListAsync(
+        FailedEventInboxListInput input,
+        CancellationToken cancellationToken = default);
 
     // Ayni filtreye uyan toplam kayit sayisini getirir.
-    Task<int> GetFilteredCountAsync(FailedEventInboxListInput input);
+    Task<int> GetFilteredCountAsync(
+        FailedEventInboxListInput input,
+        CancellationToken cancellationToken = default);
 }

@@ -1,4 +1,5 @@
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 using FluentValidation;
 using Byd.CoreExtensions.Dtos.ApiKeys;
@@ -26,16 +27,17 @@ public class ApiKeyAppService : CoreExtensionsAppService, IApiKeyAppService
     private IValidator<CreateApiKeyDto> CreateValidator =>
         LazyGetRequiredService<IValidator<CreateApiKeyDto>>();
     // Kimligi verilen API anahtarini Manager guard'i uzerinden getirir.
-    public virtual async Task<ApiKeyDto> GetAsync(Guid id)
+    public virtual async Task<ApiKeyDto> GetAsync(Guid id, CancellationToken cancellationToken = default)
     {
-        var entity = await Manager.EnsureExistsAsync(id, CancellationTokenProvider.Token);
+        var entity = await Manager.EnsureExistsAsync(id, cancellationToken);
         return Mapper.Map(entity);
     }
     // Create girdisini dogrular, Manager ile anahtar uretir ve tek UOW icinde kaydeder.
     // Uretilen anahtar degeri yalnizca bu cevapta doner; sonraki okumalar anahtari tasimaz.
-    public virtual async Task<CreatedApiKeyDto> CreateAsync(CreateApiKeyDto input)
+    public virtual async Task<CreatedApiKeyDto> CreateAsync(
+        CreateApiKeyDto input,
+        CancellationToken cancellationToken = default)
     {
-        var cancellationToken = CancellationTokenProvider.Token;
         await CreateValidator.ValidateAndThrowAsync(input, cancellationToken);
         var model = Mapper.Map(input);
         var entity = Manager.Create(model);

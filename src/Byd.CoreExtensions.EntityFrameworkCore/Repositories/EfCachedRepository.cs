@@ -47,7 +47,7 @@ public abstract class EfCachedRepository<TDbContext, TEntity, TCacheModel>
     // Kosulu saglayan ilk cache modelini dondurur.
     public virtual async Task<TCacheModel?> CachedGetByAsync(
         Expression<Func<TCacheModel, bool>> predicate,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken = default)
     {
         var cacheModels = await CachedGetListAsync(cancellationToken);
         return cacheModels.FirstOrDefault(predicate.Compile());
@@ -55,14 +55,14 @@ public abstract class EfCachedRepository<TDbContext, TEntity, TCacheModel>
     // Kosulu saglayan cache modellerini dondurur.
     public virtual async Task<List<TCacheModel>> CachedGetListByAsync(
         Expression<Func<TCacheModel, bool>> predicate,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken = default)
     {
         var cacheModels = await CachedGetListAsync(cancellationToken);
         return cacheModels.Where(predicate.Compile()).ToList();
     }
     // Cache listesini dondurur; kayit yoksa tabloyu okuyup cache'i doldurur.
     public virtual async Task<List<TCacheModel>> CachedGetListAsync(
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken = default)
     {
         var cacheModels = await DistributedListCache.GetOrAddAsync(
             CacheKey,
@@ -74,13 +74,13 @@ public abstract class EfCachedRepository<TDbContext, TEntity, TCacheModel>
     // Kosulu saglayan en az bir cache modeli olup olmadigini bildirir.
     public virtual async Task<bool> CachedAnyAsync(
         Expression<Func<TCacheModel, bool>> predicate,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken = default)
     {
         var cacheModels = await CachedGetListAsync(cancellationToken);
         return cacheModels.Any(predicate.Compile());
     }
     // Tabloyu okuyup cache listesini bastan yazar.
-    public virtual async Task SetCacheListAsync(CancellationToken cancellationToken)
+    public virtual async Task SetCacheListAsync(CancellationToken cancellationToken = default)
     {
         var cacheModels = await GetListForCachingAsync(cancellationToken);
         await DistributedListCache.SetAsync(
@@ -90,7 +90,7 @@ public abstract class EfCachedRepository<TDbContext, TEntity, TCacheModel>
             token: cancellationToken);
     }
     // Mevcut tenant'a ait cache listesini siler.
-    public virtual async Task RemoveCacheListAsync(CancellationToken cancellationToken)
+    public virtual async Task RemoveCacheListAsync(CancellationToken cancellationToken = default)
     {
         await DistributedListCache.RemoveAsync(
             CacheKey,
@@ -99,13 +99,13 @@ public abstract class EfCachedRepository<TDbContext, TEntity, TCacheModel>
     // Entity degisikliginde cache'i gecersiz kilar; sonraki okuma listeyi yeniden doldurur.
     public virtual Task HandleEntityChangedAsync(
         EntityChangedEventData<TEntity> entityChangedEventData,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken = default)
     {
         return RemoveCacheListAsync(cancellationToken);
     }
     // Tenant ve diger ABP filtrelerini koruyarak tabloyu cache model listesine donusturur.
     protected virtual async Task<List<TCacheModel>> GetListForCachingAsync(
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken = default)
     {
         var entities = await base.GetListAsync(
             includeDetails: true,

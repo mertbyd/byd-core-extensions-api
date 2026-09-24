@@ -55,19 +55,19 @@ public class BydAntiDuplicateMiddleware : IMiddleware, ITransientDependency
     // Kapsam disi istekleri dokunmadan gecirir; uygun isteklerde imzayi cache'e alip tekrari reddeder.
     public async Task InvokeAsync(HttpContext context, RequestDelegate next)
     {
-        var setting = await FindApplicableSettingAsync(context);
+        var cancellationToken = context.RequestAborted;
+        var setting = await FindApplicableSettingAsync(context, cancellationToken);
         if (setting is null)
         {
             await next(context);
             return;
         }
-        var body = await ReadBodyAsync(context.Request);
+        var body = await ReadBodyAsync(context.Request, cancellationToken);
         if (body is null)
         {
             await next(context);
             return;
         }
-        var cancellationToken = context.RequestAborted;
         var signature = _hasher.Compute(context, body);
         if (await _cache.GetAsync(signature, token: cancellationToken) is not null)
         {
@@ -92,21 +92,23 @@ public class BydAntiDuplicateMiddleware : IMiddleware, ITransientDependency
 
     // Istegin koruma kapsaminda olup olmadigini ve modul ayarinin acik olup olmadigini tek karara indirger.
     // Kapsam disi veya kapali her durumda null doner; cagiran taraf tek kosulla akisi devam ettirir.
-    private async Task<ModuleSettingCacheModel?> FindApplicableSettingAsync(HttpContext context)
+    private async Task<ModuleSettingCacheModel?> FindApplicableSettingAsync(
+        HttpContext context,
+        CancellationToken cancellationToken = default)
     {
         var request = context.Request;
         if (!IsMutatingRequest(request.Method) || !IsEligible(request))
         {
             return null;
         }
-        var setting = await _moduleSettingProvider.FindCurrentAsync(context.RequestAborted);
+        var setting = await _moduleSettingProvider.FindCurrentAsync(cancellationToken);
         return setting is not null && setting.IsEnabled && setting.IdempotencyEnabled
             ? setting
             : null;
     }
 
     // Imzayi ayardan gelen tekrar penceresi boyunca rezerve eder.
-    private async Task ReserveSignatureAsync(string signature, int ttlSeconds, CancellationToken cancellationToken)
+    private async Task ReserveSignatureAsync(string signature, int ttlSeconds, CancellationToken cancellationToken = default)
     {
         await _cache.SetAsync(
             signature,
@@ -166,7 +168,9 @@ public class BydAntiDuplicateMiddleware : IMiddleware, ITransientDependency
                path.StartsWithSegments(exclusion, StringComparison.OrdinalIgnoreCase);
     }
     // Govdeyi ust sinira kadar okuyup yeniden okunabilir birakir; sinir asilirsa null doner.
-    private static async Task<byte[]?> ReadBodyAsync(HttpRequest request)
+    private static async Task<byte[]?> ReadBodyAsync(
+        HttpRequest request,
+        CancellationToken cancellationToken = default)
     {
         request.EnableBuffering();
         request.Body.Position = 0;
@@ -177,7 +181,7 @@ public class BydAntiDuplicateMiddleware : IMiddleware, ITransientDependency
             int bytesRead;
             while ((bytesRead = await request.Body.ReadAsync(
                        readBuffer,
-                       request.HttpContext.RequestAborted)) > 0)
+                       cancellationToken)) > 0)
             {
                 if (buffer.Length + bytesRead > IdempotencyConsts.MaxBodyBytes)
                 {
@@ -186,7 +190,7 @@ public class BydAntiDuplicateMiddleware : IMiddleware, ITransientDependency
 
                 await buffer.WriteAsync(
                     readBuffer.AsMemory(0, bytesRead),
-                    request.HttpContext.RequestAborted);
+                    cancellationToken);
             }
 
             return buffer.ToArray();
@@ -203,7 +207,7 @@ public class BydAntiDuplicateMiddleware : IMiddleware, ITransientDependency
         return statusCode < StatusCodes.Status200OK || statusCode >= StatusCodes.Status300MultipleChoices;
     }
     // Mukerrer istek kodunu 409 durum koduyla localize ABP hata govdesine cevirip yanita yazar.
-    private async Task WriteDuplicateResponseAsync(HttpContext context, CancellationToken cancellationToken)
+    private async Task WriteDuplicateResponseAsync(HttpContext context, CancellationToken cancellationToken = default)
     {
         var body = new RemoteServiceErrorResponse(new RemoteServiceErrorInfo(
             _localizer[IdempotencyExceptionCodes.DuplicateRequest],

@@ -23,7 +23,7 @@ public class ModuleSettingManager : BaseManager<ModuleSetting, Guid>
     // Kimligi verilen modul ayarini getirir; yoksa BaseManager lokalize NotFound firlatir.
     public virtual async Task<ModuleSetting> EnsureExistsAsync(
         Guid id,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken = default)
     {
         return (await TryGetByIdAsync(id, throwIfNotExists: true, cancellationToken))!;
     }
@@ -31,7 +31,7 @@ public class ModuleSettingManager : BaseManager<ModuleSetting, Guid>
     // Create modelini normalize edip benzersiz bir ModuleSetting entity'sine donusturur.
     public virtual async Task<ModuleSetting> CreateAsync(
         ModuleSettingCreateModel model,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(model);
         var moduleName = NormalizeRequiredText(model.ModuleName);
@@ -49,7 +49,7 @@ public class ModuleSettingManager : BaseManager<ModuleSetting, Guid>
     public virtual async Task<ModuleSetting> UpdateAsync(
         ModuleSetting entity,
         ModuleSettingUpdateModel model,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(entity);
         ArgumentNullException.ThrowIfNull(model);

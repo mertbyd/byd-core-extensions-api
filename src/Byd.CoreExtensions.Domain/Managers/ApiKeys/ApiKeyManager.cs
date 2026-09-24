@@ -25,7 +25,7 @@ public class ApiKeyManager : BaseManager<ApiKey, Guid>
     // Kimligi verilen anahtari getirir; yoksa BaseManager lokalize NotFound firlatir.
     public virtual async Task<ApiKey> EnsureExistsAsync(
         Guid id,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken = default)
     {
         return (await TryGetByIdAsync(id, throwIfNotExists: true, cancellationToken))!;
     }

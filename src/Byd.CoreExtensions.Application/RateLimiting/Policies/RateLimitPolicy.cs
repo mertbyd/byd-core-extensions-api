@@ -131,7 +131,7 @@ public sealed class RateLimitPolicy : IRateLimiterPolicy<string>
     // 429 durum kodunu, Retry-After basligini ve ABP hata govdesini yazar.
     private async ValueTask WriteRejectionAsync(
         OnRejectedContext context,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken = default)
     {
         var response = context.HttpContext.Response;
         response.StatusCode = StatusCodes.Status429TooManyRequests;

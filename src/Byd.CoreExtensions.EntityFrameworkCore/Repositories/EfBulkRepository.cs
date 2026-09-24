@@ -30,7 +30,7 @@ public abstract class EfBulkRepository<TDbContext, TEntity>
     public virtual async Task BulkInsertManyAsync(
         IEnumerable<TEntity> entities,
         int? batchSize,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken = default)
     {
         var dbContext = await GetDbContextAsync();
         await dbContext.BulkInsertAsync(
@@ -42,7 +42,7 @@ public abstract class EfBulkRepository<TDbContext, TEntity>
     public virtual async Task BulkUpdateManyAsync(
         IEnumerable<TEntity> entities,
         int? batchSize,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken = default)
     {
         var dbContext = await GetDbContextAsync();
         await dbContext.BulkUpdateAsync(
@@ -54,7 +54,7 @@ public abstract class EfBulkRepository<TDbContext, TEntity>
     public virtual async Task BulkDeleteManyAsync(
         IEnumerable<TEntity> entities,
         int? batchSize,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken = default)
     {
         TDbContext dbContext = await GetDbContextAsync();
         await dbContext.BulkDeleteAsync(

@@ -1,4 +1,5 @@
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Byd.CoreExtensions.Consts;
@@ -27,11 +28,12 @@ public class ApiKeyController : CoreExtensionsController//todo : auth module gel
     /// Kayit bulunamazsa Manager varlik kontrolu devreye girer ve istek EntityNotFound hata koduyla reddedilir.
     /// </summary>
     /// <param name="id">Getirilecek API anahtari kaydinin benzersiz kimligi.</param>
+    /// <param name="cancellationToken">Istek iptal belirteci.</param>
     /// <returns>Ad, aktiflik, son kullanma ve kapsam alanlariyla tek API anahtari kaydi.</returns>
     [HttpGet(ApiKeyRoutes.ById)]
-    public virtual async Task<Result<ApiKeyDto>> Get(Guid id)
+    public virtual async Task<Result<ApiKeyDto>> Get(Guid id, CancellationToken cancellationToken = default)
     {
-        var result = await AppService.GetAsync(id);
+        var result = await AppService.GetAsync(id, cancellationToken);
         return result;
     }
     /// <summary>
@@ -40,12 +42,14 @@ public class ApiKeyController : CoreExtensionsController//todo : auth module gel
     /// Kaydin tenant ve organizasyon alanlari istegin guncel kapsamindan damgalanir.
     /// </summary>
     /// <param name="input">Anahtarin adini, aktifligini ve istege bagli son kullanma zamanini tasiyan uretme istegi.</param>
+    /// <param name="cancellationToken">Istek iptal belirteci.</param>
     /// <returns>Uretilen kimlik, kapsam alanlari ve tek seferlik ham anahtar degeri.</returns>
     [HttpPost]
     public virtual async Task<Result<CreatedApiKeyDto>> Create(
-        [FromBody] CreateApiKeyDto input)
+        [FromBody] CreateApiKeyDto input,
+        CancellationToken cancellationToken = default)
     {
-        var result = await AppService.CreateAsync(input);
+        var result = await AppService.CreateAsync(input, cancellationToken);
         return result;
     }
 }

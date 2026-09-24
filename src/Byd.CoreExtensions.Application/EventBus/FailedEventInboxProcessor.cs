@@ -99,7 +99,7 @@ public class FailedEventInboxProcessor : IFailedEventInboxProcessor, ITransientD
         bool retryUnlimited,
         int retryWindowSeconds,
         IServiceProvider services,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken = default)
     {
         var repository = services.GetRequiredService<IFailedEventInboxRepository>();
         var ownerModuleName = services.GetRequiredService<CurrentModuleNameProvider>().Value;
@@ -128,7 +128,7 @@ public class FailedEventInboxProcessor : IFailedEventInboxProcessor, ITransientD
         bool retryUnlimited,
         int retryWindowSeconds,
         IServiceProvider services,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken = default)
     {
         var manager = services.GetRequiredService<FailedEventInboxManager>();
         if (manager.IsRetryWindowExpired(record, retryUnlimited, retryWindowSeconds))

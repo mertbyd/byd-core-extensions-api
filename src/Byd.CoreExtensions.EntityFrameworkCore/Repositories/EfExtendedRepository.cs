@@ -39,7 +39,7 @@ public abstract class EfExtendedRepository<TDbContext, TEntity, TKey>
     // Filtre, siralama ve sayfalamayi uygulayip sayfa kayitlarini dondurur.
     public virtual async Task<List<TEntity>> GetFilteredListAsync<TFiltering>(
         IDataTablePagingProperty<TFiltering> pagingProperty,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken = default)
         where TFiltering : class
     {
         var query = await CreateFilteredQueryAsync(pagingProperty);
@@ -50,7 +50,7 @@ public abstract class EfExtendedRepository<TDbContext, TEntity, TKey>
     // Filtreleri uygulayip sayfalamadan onceki toplam kayit sayisini dondurur.
     public virtual async Task<int> GetFilteredCountAsync<TFiltering>(
         IDataTablePagingProperty<TFiltering> pagingProperty,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken = default)
         where TFiltering : class
     {
         var query = await CreateFilteredQueryAsync(pagingProperty);
@@ -60,7 +60,7 @@ public abstract class EfExtendedRepository<TDbContext, TEntity, TKey>
     public virtual async Task<bool> IsDataUsedAsync(
         TEntity entity,
         IEnumerable<Type>? ignoredEntityTypes,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken = default)
     {
         var dbContext = await GetDbContextAsync();
         var entityType = dbContext.Model.FindEntityType(typeof(TEntity));
@@ -118,7 +118,7 @@ public abstract class EfExtendedRepository<TDbContext, TEntity, TKey>
         DbContext dbContext,
         IForeignKey foreignKey,
         IReadOnlyDictionary<string, object?> principalKeyValues,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken = default)
     {
         var dependentClrType = foreignKey.DeclaringEntityType.ClrType;
         var parameter = Expression.Parameter(dependentClrType, DataTableQueryConsts.DependentParameterName);
@@ -137,7 +137,7 @@ public abstract class EfExtendedRepository<TDbContext, TEntity, TKey>
     private static Task<bool> AnyReferencingAsync<TDependent>(
         DbContext dbContext,
         Expression<Func<TDependent, bool>> predicate,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken = default)
         where TDependent : class
     {
         return dbContext.Set<TDependent>().AnyAsync(predicate, cancellationToken);

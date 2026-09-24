@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using FluentValidation;
 using Byd.CoreExtensions.Dtos.ModuleSettings;
@@ -30,41 +31,40 @@ public class ModuleSettingAppService : CoreExtensionsAppService, IModuleSettingA
     private IValidator<UpdateModuleSettingDto> UpdateValidator =>
         LazyGetRequiredService<IValidator<UpdateModuleSettingDto>>();
     // Kimligi verilen modul ayarini Manager guard'i uzerinden getirir.
-    public virtual async Task<ModuleSettingDto> GetAsync(Guid id)
+    public virtual async Task<ModuleSettingDto> GetAsync(Guid id, CancellationToken cancellationToken = default)
     {
-        var entity = await Manager.EnsureExistsAsync(id, CancellationTokenProvider.Token);
+        var entity = await Manager.EnsureExistsAsync(id, cancellationToken);
         return Mapper.Map(entity);
     }
     // Kimligi verilen modul ayarinin yalniz rate limit alanlarini getirir.
-    public virtual async Task<ModuleSettingRateLimitDto> GetRateLimitAsync(Guid id)
+    public virtual async Task<ModuleSettingRateLimitDto> GetRateLimitAsync(Guid id, CancellationToken cancellationToken = default)
     {
-        var entity = await Manager.EnsureExistsAsync(id, CancellationTokenProvider.Token);
+        var entity = await Manager.EnsureExistsAsync(id, cancellationToken);
         return Mapper.MapRateLimit(entity);
     }
     // Kimligi verilen modul ayarinin yalniz idempotency alanlarini getirir.
-    public virtual async Task<ModuleSettingIdempotencyDto> GetIdempotencyAsync(Guid id)
+    public virtual async Task<ModuleSettingIdempotencyDto> GetIdempotencyAsync(Guid id, CancellationToken cancellationToken = default)
     {
-        var entity = await Manager.EnsureExistsAsync(id, CancellationTokenProvider.Token);
+        var entity = await Manager.EnsureExistsAsync(id, cancellationToken);
         return Mapper.MapIdempotency(entity);
     }
     // Kimligi verilen modul ayarinin yalniz olay kutusu alanlarini getirir.
-    public virtual async Task<ModuleSettingEventBoxDto> GetEventBoxAsync(Guid id)
+    public virtual async Task<ModuleSettingEventBoxDto> GetEventBoxAsync(Guid id, CancellationToken cancellationToken = default)
     {
-        var entity = await Manager.EnsureExistsAsync(id, CancellationTokenProvider.Token);
+        var entity = await Manager.EnsureExistsAsync(id, cancellationToken);
         return Mapper.MapEventBox(entity);
     }
     // Tum modul ayarlarini detay iliskisi yuklemeden repository'den getirir.
-    public virtual async Task<List<ModuleSettingDto>> GetListAsync()
+    public virtual async Task<List<ModuleSettingDto>> GetListAsync(CancellationToken cancellationToken = default)
     {
         var entities = await Repository.GetListAsync(
             includeDetails: false,
-            cancellationToken: CancellationTokenProvider.Token);
+            cancellationToken: cancellationToken);
         return Mapper.Map(entities);
     }
     // Create girdisini dogrular, Manager ile entity kurar ve tek UOW icinde kaydeder.
-    public virtual async Task<ModuleSettingDto> CreateAsync(CreateModuleSettingDto input)
+    public virtual async Task<ModuleSettingDto> CreateAsync(CreateModuleSettingDto input, CancellationToken cancellationToken = default)
     {
-        var cancellationToken = CancellationTokenProvider.Token;
         await CreateValidator.ValidateAndThrowAsync(input, cancellationToken);
         var model = Mapper.Map(input);
         var entity = await Manager.CreateAsync(model, cancellationToken);
@@ -74,9 +74,9 @@ public class ModuleSettingAppService : CoreExtensionsAppService, IModuleSettingA
     // Update girdisini dogrular, mevcut entity'yi Manager ile degistirir ve kaydeder.
     public virtual async Task<ModuleSettingDto> UpdateAsync(
         Guid id,
-        UpdateModuleSettingDto input)
+        UpdateModuleSettingDto input,
+        CancellationToken cancellationToken = default)
     {
-        var cancellationToken = CancellationTokenProvider.Token;
         await UpdateValidator.ValidateAndThrowAsync(input, cancellationToken);
         var entity = await Manager.EnsureExistsAsync(id, cancellationToken);
         var model = Mapper.Map(input);
@@ -85,9 +85,8 @@ public class ModuleSettingAppService : CoreExtensionsAppService, IModuleSettingA
         return Mapper.Map(entity);
     }
     // Kimligi verilen modul ayarini varlik guard'i sonrasinda kalici olarak siler.
-    public virtual async Task DeleteAsync(Guid id)
+    public virtual async Task DeleteAsync(Guid id, CancellationToken cancellationToken = default)
     {
-        var cancellationToken = CancellationTokenProvider.Token;
         var entity = await Manager.EnsureExistsAsync(id, cancellationToken);
         await Repository.DeleteAsync(entity, autoSave: true, cancellationToken: cancellationToken);
     }

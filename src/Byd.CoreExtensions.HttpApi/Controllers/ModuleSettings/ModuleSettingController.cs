@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Byd.CoreExtensions.Consts;
@@ -27,55 +28,60 @@ public class ModuleSettingController : CoreExtensionsController//todo : auth mod
     /// Kayit bulunamazsa Manager varlik kontrolu devreye girer ve istek EntityNotFound hata koduyla reddedilir.
     /// </summary>
     /// <param name="id">Getirilecek modul ayari kaydinin benzersiz kimligi.</param>
+    /// <param name="cancellationToken">Istek iptal belirteci.</param>
     /// <returns>Modul adi, TTL suresi ve rate limit alanlariyla birlikte tek modul ayari kaydi.</returns>
     [HttpGet(ModuleSettingRoutes.ById)]
-    public virtual async Task<Result<ModuleSettingDto>> Get(Guid id)
+    public virtual async Task<Result<ModuleSettingDto>> Get(Guid id, CancellationToken cancellationToken = default)
     {
-        var result = await AppService.GetAsync(id);
+        var result = await AppService.GetAsync(id, cancellationToken);
         return result;
     }
     /// <summary>
     /// Kimligi verilen modul ayari kaydinin rate limit alanlarini getirir.
     /// </summary>
     /// <param name="id">Rate limit alanlari okunacak modul ayari kaydinin benzersiz kimligi.</param>
+    /// <param name="cancellationToken">Istek iptal belirteci.</param>
     /// <returns>Modul anahtarlari ve rate limit ayarlarini iceren cevap.</returns>
     [HttpGet(ModuleSettingRoutes.RateLimitById)]
-    public virtual async Task<Result<ModuleSettingRateLimitDto>> GetRateLimit(Guid id)
+    public virtual async Task<Result<ModuleSettingRateLimitDto>> GetRateLimit(Guid id, CancellationToken cancellationToken = default)
     {
-        var result = await AppService.GetRateLimitAsync(id);
+        var result = await AppService.GetRateLimitAsync(id, cancellationToken);
         return result;
     }
     /// <summary>
     /// Kimligi verilen modul ayari kaydinin idempotency alanlarini getirir.
     /// </summary>
     /// <param name="id">Idempotency alanlari okunacak modul ayari kaydinin benzersiz kimligi.</param>
+    /// <param name="cancellationToken">Istek iptal belirteci.</param>
     /// <returns>Modul anahtarlari ve idempotency ayarlarini iceren cevap.</returns>
     [HttpGet(ModuleSettingRoutes.IdempotencyById)]
-    public virtual async Task<Result<ModuleSettingIdempotencyDto>> GetIdempotency(Guid id)
+    public virtual async Task<Result<ModuleSettingIdempotencyDto>> GetIdempotency(Guid id, CancellationToken cancellationToken = default)
     {
-        var result = await AppService.GetIdempotencyAsync(id);
+        var result = await AppService.GetIdempotencyAsync(id, cancellationToken);
         return result;
     }
     /// <summary>
     /// Kimligi verilen modul ayari kaydinin olay kutusu alanlarini getirir.
     /// </summary>
     /// <param name="id">Olay kutusu alanlari okunacak modul ayari kaydinin benzersiz kimligi.</param>
+    /// <param name="cancellationToken">Istek iptal belirteci.</param>
     /// <returns>Modul anahtarlari ve olay kutusu ayarlarini iceren cevap.</returns>
     [HttpGet(ModuleSettingRoutes.EventBoxById)]
-    public virtual async Task<Result<ModuleSettingEventBoxDto>> GetEventBox(Guid id)
+    public virtual async Task<Result<ModuleSettingEventBoxDto>> GetEventBox(Guid id, CancellationToken cancellationToken = default)
     {
-        var result = await AppService.GetEventBoxAsync(id);
+        var result = await AppService.GetEventBoxAsync(id, cancellationToken);
         return result;
     }
     /// <summary>
     /// Kayitli tum modul ayarlarini tek listede getirir.
     /// Liste sayfalanmaz; tablo her modul icin tek satir tutan kucuk bir yapilandirma kayit defteridir.
     /// </summary>
+    /// <param name="cancellationToken">Istek iptal belirteci.</param>
     /// <returns>Her modulun ayar kaydini iceren tam liste; kayit yoksa bos liste.</returns>
     [HttpGet]
-    public virtual async Task<Result<List<ModuleSettingDto>>> GetList()
+    public virtual async Task<Result<List<ModuleSettingDto>>> GetList(CancellationToken cancellationToken = default)
     {
-        var result = await AppService.GetListAsync();
+        var result = await AppService.GetListAsync(cancellationToken);
         return result;
     }
     /// <summary>
@@ -83,12 +89,14 @@ public class ModuleSettingController : CoreExtensionsController//todo : auth mod
     /// Modul adi Manager tarafinda normalize edilir ve ayni adla ikinci kayit acilmasi engellenir.
     /// </summary>
     /// <param name="input">Modul adi, TTL suresi ve rate limit varsayilanlarini tasiyan create istegi.</param>
+    /// <param name="cancellationToken">Istek iptal belirteci.</param>
     /// <returns>Uretilen kimlik ve kalici hale gelmis alanlarla birlikte yeni modul ayari kaydi.</returns>
     [HttpPost]
     public virtual async Task<Result<ModuleSettingDto>> Create(
-        [FromBody] CreateModuleSettingDto input)
+        [FromBody] CreateModuleSettingDto input,
+        CancellationToken cancellationToken = default)
     {
-        var result = await AppService.CreateAsync(input);
+        var result = await AppService.CreateAsync(input, cancellationToken);
         return result;
     }
     /// <summary>
@@ -97,13 +105,15 @@ public class ModuleSettingController : CoreExtensionsController//todo : auth mod
     /// </summary>
     /// <param name="id">Guncellenecek modul ayari kaydinin benzersiz kimligi.</param>
     /// <param name="input">Kaydin yeni modul adi, TTL suresi ve rate limit degerlerini tasiyan update istegi.</param>
+    /// <param name="cancellationToken">Istek iptal belirteci.</param>
     /// <returns>Guncel alanlari ve yeni son degistirilme zamanini tasiyan modul ayari kaydi.</returns>
     [HttpPut(ModuleSettingRoutes.ById)]
     public virtual async Task<Result<ModuleSettingDto>> Update(
         Guid id,
-        [FromBody] UpdateModuleSettingDto input)
+        [FromBody] UpdateModuleSettingDto input,
+        CancellationToken cancellationToken = default)
     {
-        var result = await AppService.UpdateAsync(id, input);
+        var result = await AppService.UpdateAsync(id, input, cancellationToken);
         return result;
     }
     /// <summary>
@@ -111,11 +121,12 @@ public class ModuleSettingController : CoreExtensionsController//todo : auth mod
     /// Silinen modul bir sonraki tazelemede satirsiz kalir ve rate limit'i sabit varsayilanlara duser.
     /// </summary>
     /// <param name="id">Silinecek modul ayari kaydinin benzersiz kimligi.</param>
+    /// <param name="cancellationToken">Istek iptal belirteci.</param>
     /// <returns>Govdesiz basari sonucu.</returns>
     [HttpDelete(ModuleSettingRoutes.ById)]
-    public virtual async Task<Result> Delete(Guid id)
+    public virtual async Task<Result> Delete(Guid id, CancellationToken cancellationToken = default)
     {
-        await AppService.DeleteAsync(id);
+        await AppService.DeleteAsync(id, cancellationToken);
         return Result.NoContent();
     }
 }
