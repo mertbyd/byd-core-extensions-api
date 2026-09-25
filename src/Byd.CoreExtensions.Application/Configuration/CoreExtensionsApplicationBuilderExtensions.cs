@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Byd.AntiDuplicate.Middleware.Middleware;
 using Byd.CoreExtensions.ApiKeys;
 using Byd.CoreExtensions.Data.ModuleSettings;
+using Byd.CoreExtensions.Organizations;
 using Byd.CoreExtensions.RateLimiting;
 using Volo.Abp.Data;
 using Volo.Abp.Uow;
@@ -18,15 +19,18 @@ namespace Byd.CoreExtensions;
 // sistemdeki gorevi: Modulun tuketen host'a actigi tek acilis kancasi. Modul adi CurrentModuleNameProvider uzerinden host'un Configure beyanindan cozulur; bu cagri yapilmazsa modul satiri hic yazilmaz ve modul acilista durur.
 public static class CoreExtensionsApplicationBuilderExtensions
 {
-    // Host beyanini isaretler, modulun acilis isini calistirir ve mukerrer istek korumasini pipeline'a takar.
-    // Cagrinin host pipeline'indaki yeri korumanin da yeridir: kimlik ve kiraci baglamini kuran
-    // middleware'lerden sonra, endpoint'lerden once cagrilmalidir.
+    // Host beyanini isaretler, modulun acilis isini calistirir, organizasyon kapsamini ve mukerrer istek
+    // korumasini pipeline'a takar. Cagrinin host pipeline'indaki yeri bu ikisinin de yeridir: kimlik ve kiraci
+    // baglamini kuran middleware'lerden sonra, endpoint'lerden once cagrilmalidir. Organizasyon kapsami
+    // token'daki claim'den okundugu icin UseAuthentication'dan once cagrilirsa kapsam hep bos kalir.
     public static IApplicationBuilder UseCoreExtensions(this IApplicationBuilder app)
     {
         app.ApplicationServices.GetRequiredService<PipelineConfigurationState>().MarkConfigured();
         // Pipeline kurulumu senkron oldugu icin acilis isi burada beklenir. Istek yolunda degil,
         // process basina bir kez calisan acilis adimi oldugu icin bloklama kabul edilir.
         InitializeAsync(app.ApplicationServices).GetAwaiter().GetResult();
+        // Kapsam once kurulur: altindaki her middleware ve endpoint ayni organizasyonu gorsun diye.
+        app.UseMiddleware<OrganizationMiddleware>();
         app.UseMiddleware<BydAntiDuplicateMiddleware>();
         return app;
     }
