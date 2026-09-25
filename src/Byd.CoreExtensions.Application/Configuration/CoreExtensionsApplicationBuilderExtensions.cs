@@ -1,4 +1,5 @@
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
@@ -35,32 +36,38 @@ public static class CoreExtensionsApplicationBuilderExtensions
         return app;
     }
     // Once modul satirini yazar, sonra o satirdan beslenen bellek goruntulerini yukler.
-    private static async Task InitializeAsync(IServiceProvider serviceProvider)
+    private static async Task InitializeAsync(
+        IServiceProvider serviceProvider,
+        CancellationToken cancellationToken = default)
     {
-        await EnsureModuleSettingAsync(serviceProvider);
-        await LoadStateSnapshotsAsync(serviceProvider);
+        await EnsureModuleSettingAsync(serviceProvider, cancellationToken);
+        await LoadStateSnapshotsAsync(serviceProvider, cancellationToken);
     }
     // Beyan edilen modul satirini kendi unit of work'unde yazar; yazma islemi okuma akisina
     // acik transaction birakmasin diye ayri tutulur. Yazim idempotenttir: mevcut satira dokunmaz,
     // boylece yoneticinin degistirdigi degerler korunur.
-    private static async Task EnsureModuleSettingAsync(IServiceProvider serviceProvider)
+    private static async Task EnsureModuleSettingAsync(
+        IServiceProvider serviceProvider,
+        CancellationToken cancellationToken = default)
     {
         using var scope = serviceProvider.CreateScope();
         var unitOfWorkManager = scope.ServiceProvider.GetRequiredService<IUnitOfWorkManager>();
         using var unitOfWork = unitOfWorkManager.Begin();
         await scope.ServiceProvider.GetRequiredService<ModuleSettingDataSeeder>()
             .SeedAsync(new DataSeedContext());
-        await unitOfWork.CompleteAsync();
+        await unitOfWork.CompleteAsync(cancellationToken);
     }
     // Rate limit ayarlarini ve tum API anahtarlarini okuyup bellege yukler. Ilk yukleme basarisiz
     // olsa bile sistem calisir: her iki goruntu de bayat sayilir ve ilk istekte kendini tazeler.
-    private static async Task LoadStateSnapshotsAsync(IServiceProvider serviceProvider)
+    private static async Task LoadStateSnapshotsAsync(
+        IServiceProvider serviceProvider,
+        CancellationToken cancellationToken = default)
     {
         using var scope = serviceProvider.CreateScope();
         var unitOfWorkManager = scope.ServiceProvider.GetRequiredService<IUnitOfWorkManager>();
         using var unitOfWork = unitOfWorkManager.Begin();
-        await scope.ServiceProvider.GetRequiredService<RateLimitStateRefresher>().RefreshAsync();
-        await scope.ServiceProvider.GetRequiredService<ApiKeyStateRefresher>().RefreshAsync();
-        await unitOfWork.CompleteAsync();
+        await scope.ServiceProvider.GetRequiredService<RateLimitStateRefresher>().RefreshAsync(cancellationToken);
+        await scope.ServiceProvider.GetRequiredService<ApiKeyStateRefresher>().RefreshAsync(cancellationToken);
+        await unitOfWork.CompleteAsync(cancellationToken);
     }
 }
