@@ -10,6 +10,12 @@ namespace Byd.CoreExtensions.Entities;
 // sistemdeki gorevi: API anahtari dogrulamasinin tek veri kaynagi. Sahiplik alanlari yalnizca tasinan veridir; global sorgu filtresine baglanmaz, cunku anahtar istege kapsam bilgisi olmadan gelir ve kapsami zaten kendisi belirler.
 public class ApiKey : CreationAuditedEntity<Guid>
 {
+    // Anahtarin ait oldugu tenant; istek bu anahtarla geldiginde tenant baglami buradan kurulur.
+    public Guid? TenantId { get; internal set; }
+
+    // Anahtarin bagli oldugu organizasyon; istek baglamina tasinir, downstream kod anahtardan okur.
+    public Guid? OrganizationId { get; internal set; }
+
     // Istemcinin gonderdigi anahtar degeri; istekteki header degeriyle karsilastirilir.
     public string Key { get; internal set; } = default!;
 
@@ -18,12 +24,6 @@ public class ApiKey : CreationAuditedEntity<Guid>
 
     // Anahtarin son gecerlilik zamani (UTC); null ise anahtarin suresi hic dolmaz.
     public DateTime? ExpiresAt { get; internal set; }
-
-    // Anahtarin ait oldugu tenant; istek bu anahtarla geldiginde tenant baglami buradan kurulur.
-    public Guid? TenantId { get; internal set; }
-
-    // Anahtarin bagli oldugu organizasyon; istek baglamina tasinir, downstream kod anahtardan okur.
-    public Guid? OrganizationId { get; internal set; }
 
     protected ApiKey()
     {

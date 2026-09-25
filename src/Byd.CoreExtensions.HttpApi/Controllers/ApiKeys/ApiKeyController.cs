@@ -31,7 +31,7 @@ public class ApiKeyController : CoreExtensionsController//todo : auth module gel
     /// <param name="cancellationToken">Istek iptal belirteci.</param>
     /// <returns>Ad, aktiflik, son kullanma ve kapsam alanlariyla tek API anahtari kaydi.</returns>
     [HttpGet(ApiKeyRoutes.ById)]
-    public virtual async Task<Result<ApiKeyDto>> Get(Guid id, CancellationToken cancellationToken = default)
+    public virtual async Task<Result<ApiKeyDto>> GetAsync(Guid id, CancellationToken cancellationToken = default)
     {
         var result = await AppService.GetAsync(id, cancellationToken);
         return result;
@@ -45,7 +45,7 @@ public class ApiKeyController : CoreExtensionsController//todo : auth module gel
     /// <param name="cancellationToken">Istek iptal belirteci.</param>
     /// <returns>Uretilen kimlik, kapsam alanlari ve tek seferlik ham anahtar degeri.</returns>
     [HttpPost]
-    public virtual async Task<Result<CreatedApiKeyDto>> Create(
+    public virtual async Task<Result<CreatedApiKeyDto>> CreateAsync(
         [FromBody] CreateApiKeyDto input,
         CancellationToken cancellationToken = default)
     {

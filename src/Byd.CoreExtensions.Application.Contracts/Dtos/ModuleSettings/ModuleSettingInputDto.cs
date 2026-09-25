@@ -10,11 +10,9 @@ namespace Byd.CoreExtensions.Dtos.ModuleSettings;
 // sistemdeki gorevi: FluentValidation ile Mapperly arasindaki ortak request sozlesmesidir.
 public abstract class ModuleSettingInputDto
 {
-    public string ModuleName { get; set; } = default!;
-
     // Satirin kapsami; bos birakilirsa host satiri olarak yazilir ve tum tenant'lar icin gecerli olur.
     public Guid? TenantId { get; set; }
-
+    public string ModuleName { get; set; } = default!;
     public bool IsEnabled { get; set; }
     public int TtlSeconds { get; set; } = ModuleSettingConsts.DefaultTtlSeconds;
     public bool RateLimitEnabled { get; set; }

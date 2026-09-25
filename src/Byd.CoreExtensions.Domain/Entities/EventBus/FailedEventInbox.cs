@@ -19,7 +19,6 @@ public class FailedEventInbox : AuditedAggregateRoot<Guid>
 {
     public string MessageId { get; internal set; } = default!;
     public string EventName { get; internal set; } = default!;
-    public byte[] EventData { get; internal set; } = default!;
     public string OwnerModuleName { get; internal set; } = default!;
     public string OwnerEnvironmentName { get; internal set; } = default!;
     public bool IsProcessed { get; internal set; }
@@ -28,6 +27,7 @@ public class FailedEventInbox : AuditedAggregateRoot<Guid>
     public int RetryCount { get; internal set; }
     public string? ExceptionMessage { get; internal set; }
     public string? ExceptionStackTrace { get; internal set; }
+    public byte[] EventData { get; internal set; } = default!;
 
     // EF Core materializasyonu icin parametresiz ctor.
     protected FailedEventInbox()

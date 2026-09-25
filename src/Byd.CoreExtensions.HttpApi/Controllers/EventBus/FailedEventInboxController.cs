@@ -31,7 +31,7 @@ public class FailedEventInboxController : CoreExtensionsController//todo : auth 
     /// <returns>Olay kapsami, isleme durumu ve hata bilgisiyle tek basarisiz olay kaydi.</returns>
     // Kimligi verilen basarisiz olay kaydini getirir.
     [HttpGet(FailedEventInboxRoutes.ById)]
-    public virtual async Task<Result<FailedEventInboxDto>> Get(Guid id, CancellationToken cancellationToken = default)
+    public virtual async Task<Result<FailedEventInboxDto>> GetAsync(Guid id, CancellationToken cancellationToken = default)
     {
         var result = await AppService.GetAsync(id, cancellationToken);
         return result;
@@ -44,7 +44,7 @@ public class FailedEventInboxController : CoreExtensionsController//todo : auth 
     /// <returns>Filtre kosullarini saglayan basarisiz olay kayitlari.</returns>
     // Filtreli ve sayfalanmis basarisiz olay listesini getirir.
     [HttpPost(FailedEventInboxRoutes.FilteredList)]
-    public virtual async Task<Result<List<FailedEventInboxDto>>> GetFilteredList(
+    public virtual async Task<Result<List<FailedEventInboxDto>>> GetFilteredListAsync(
         [FromBody] FailedEventInboxListInput input,
         CancellationToken cancellationToken = default)
     {
@@ -59,7 +59,7 @@ public class FailedEventInboxController : CoreExtensionsController//todo : auth 
     /// <returns>Filtrelenmis basarisiz olay kaydi sayisi.</returns>
     // Ayni filtreye uyan toplam basarisiz olay kaydi sayisini getirir.
     [HttpPost(FailedEventInboxRoutes.FilteredCount)]
-    public virtual async Task<Result<int>> GetFilteredCount(
+    public virtual async Task<Result<int>> GetFilteredCountAsync(
         [FromBody] FailedEventInboxListInput input,
         CancellationToken cancellationToken = default)
     {
