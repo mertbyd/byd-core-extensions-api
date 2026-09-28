@@ -7,6 +7,7 @@ using Byd.CoreExtensions.Consts;
 using Byd.CoreExtensions.EventBus;
 using Byd.CoreExtensions.ExceptionCodes;
 using Byd.CoreExtensions.RateLimiting;
+using Byd.CoreExtensions.Tenants;
 using Volo.Abp;
 using Volo.Abp.Application;
 using Volo.Abp.BackgroundWorkers;
@@ -16,6 +17,7 @@ using Volo.Abp.EventBus.Distributed;
 using Volo.Abp.EventBus.RabbitMq;
 using Volo.Abp.Mapperly;
 using Volo.Abp.Modularity;
+using Volo.Abp.MultiTenancy;
 namespace Byd.CoreExtensions;
 
 /// <summary>
@@ -48,6 +50,11 @@ public class CoreExtensionsApplicationModule : AbpModule
         {
             options.InboxProcessorFailurePolicy = InboxProcessorFailurePolicy.RetryLater;
             options.InboxProcessorMaxRetryCount = EventBoxConsts.InboxProcessorMaxRetryCount;
+        });
+        // Token'daki tenant claim'i, kullanicinin kendi tenant'ina sabitleyen cerceve cozumleyicisinden once okunur.
+        Configure<AbpTenantResolveOptions>(options =>
+        {
+            options.TenantResolvers.Insert(0, new ClaimTenantResolveContributor());
         });
         context.Services.AddCoreExtensionsRateLimiter();
         context.Services.AddCoreExtensionsApiKeyValidation();
