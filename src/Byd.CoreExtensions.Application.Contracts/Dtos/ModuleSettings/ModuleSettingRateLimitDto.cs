@@ -10,8 +10,8 @@ namespace Byd.CoreExtensions.Dtos.ModuleSettings;
 public class ModuleSettingRateLimitDto
 {
     public Guid Id { get; set; }
-    public string ModuleName { get; set; } = default!;
     public Guid? TenantId { get; set; }
+    public string ModuleName { get; set; } = default!;
     public bool IsEnabled { get; set; }
     public int TtlSeconds { get; set; }
     public bool RateLimitEnabled { get; set; }

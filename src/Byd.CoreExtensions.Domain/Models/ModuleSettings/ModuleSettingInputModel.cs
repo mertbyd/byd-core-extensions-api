@@ -10,11 +10,9 @@ namespace Byd.CoreExtensions.Models.ModuleSettings;
 // sistemdeki gorevi: Mapperly ile ModuleSettingManager arasindaki ortak girdi sozlesmesidir.
 public abstract class ModuleSettingInputModel
 {
-    public string ModuleName { get; set; } = default!;
-
     // Satirin kapsami; null birakilirsa host satiri olarak yazilir ve tum tenant'lar icin gecerli olur.
     public Guid? TenantId { get; set; }
-
+    public string ModuleName { get; set; } = default!;
     public bool IsEnabled { get; set; }
     public int TtlSeconds { get; set; } = ModuleSettingConsts.DefaultTtlSeconds;
     public bool RateLimitEnabled { get; set; }

@@ -23,26 +23,26 @@ public interface ICachedRepository<TEntity, TCacheModel> : IRepository<TEntity>,
     // Kosulu saglayan ilk kaydi cache uzerinden dondurur.
     Task<TCacheModel?> CachedGetByAsync(
         Expression<Func<TCacheModel, bool>> predicate,
-        CancellationToken cancellationToken);
+        CancellationToken cancellationToken = default);
     // Kosulu saglayan kayitlari cache uzerinden dondurur.
     Task<List<TCacheModel>> CachedGetListByAsync(
         Expression<Func<TCacheModel, bool>> predicate,
-        CancellationToken cancellationToken);
+        CancellationToken cancellationToken = default);
     // Cache'teki tum kayitlari dondurur; cache bossa once doldurulur.
     Task<List<TCacheModel>> CachedGetListAsync(
-        CancellationToken cancellationToken);
+        CancellationToken cancellationToken = default);
     // Kosulu saglayan kayit var mi diye cache uzerinden bakar.
     Task<bool> CachedAnyAsync(
         Expression<Func<TCacheModel, bool>> predicate,
-        CancellationToken cancellationToken);
+        CancellationToken cancellationToken = default);
     // Tabloyu okuyup cache'i bastan doldurur.
     Task SetCacheListAsync(
-        CancellationToken cancellationToken);
+        CancellationToken cancellationToken = default);
     // Cache'i temizler; bir sonraki okuma tabloyu yeniden yukler.
     Task RemoveCacheListAsync(
-        CancellationToken cancellationToken);
+        CancellationToken cancellationToken = default);
     // Entity degisiklik olayi geldiginde cache'i gecersiz kilar; cache tazeligini bu metot korur.
     Task HandleEntityChangedAsync(
         EntityChangedEventData<TEntity> entityChangedEventData,
-        CancellationToken cancellationToken);
+        CancellationToken cancellationToken = default);
 }

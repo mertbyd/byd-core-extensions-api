@@ -1,4 +1,5 @@
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 using Byd.CoreExtensions.Dtos.ApiKeys;
 using Volo.Abp.Application.Services;
@@ -13,8 +14,8 @@ namespace Byd.CoreExtensions.Services.ApiKeys;
 public interface IApiKeyAppService : IApplicationService
 {
     // Kimligi verilen API anahtari kaydini getirir.
-    Task<ApiKeyDto> GetAsync(Guid id);
+    Task<ApiKeyDto> GetAsync(Guid id, CancellationToken cancellationToken = default);
 
     // Dogrulanmis girdiden yeni API anahtari uretir ve anahtar degerini tek seferlik doner.
-    Task<CreatedApiKeyDto> CreateAsync(CreateApiKeyDto input);
+    Task<CreatedApiKeyDto> CreateAsync(CreateApiKeyDto input, CancellationToken cancellationToken = default);
 }

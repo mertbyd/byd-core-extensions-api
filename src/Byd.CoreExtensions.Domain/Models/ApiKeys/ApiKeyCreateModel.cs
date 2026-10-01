@@ -9,8 +9,8 @@ namespace Byd.CoreExtensions.Models.ApiKeys;
 // sistemdeki gorevi: Mapperly ile ApiKeyManager arasindaki transporttan bagimsiz girdi sozlesmesidir.
 public sealed class ApiKeyCreateModel
 {
-    public string Name { get; set; } = default!;
-    public DateTime? ExpiresAt { get; set; }
     public Guid? TenantId { get; set; }
     public Guid? OrganizationId { get; set; }
+    public string Name { get; set; } = default!;
+    public DateTime? ExpiresAt { get; set; }
 }

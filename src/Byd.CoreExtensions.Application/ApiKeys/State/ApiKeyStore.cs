@@ -54,7 +54,7 @@ public class ApiKeyStore : IApiKeyStore, ITransientDependency
     // Goruntu tazeyse dogrudan doner; TTL dolduysa kilidi alan tek istek tabloyu yeniden yukler.
     // Kilit alindiktan sonra tazelik yeniden kontrol edilir; boylece beklerken baskasi yuklediyse
     // tablo ikinci kez okunmaz.
-    private async Task<ApiKeySnapshot> GetFreshSnapshotAsync(CancellationToken cancellationToken)
+    private async Task<ApiKeySnapshot> GetFreshSnapshotAsync(CancellationToken cancellationToken = default)
     {
         if (!IsExpired(_state.Current))
             return _state.Current;

@@ -18,18 +18,18 @@ public interface IExtendedRepository<TEntity> : IBulkRepository<TEntity>
     // Filtre, siralama ve sayfalamayi uygulayip sayfa kayitlarini dondurur.
     Task<List<TEntity>> GetFilteredListAsync<TFiltering>(
         IDataTablePagingProperty<TFiltering> pagingProperty,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken = default)
         where TFiltering : class;
 
     // Filtreleri uygulayip sayfalamadan onceki toplam kayit sayisini dondurur.
     Task<int> GetFilteredCountAsync<TFiltering>(
         IDataTablePagingProperty<TFiltering> pagingProperty,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken = default)
         where TFiltering : class;
 
     // Kaydin baska tablolardan yabanci anahtarla referans alinip alinmadigini bildirir; silme oncesi guvenlik kontrolu.
     Task<bool> IsDataUsedAsync(
         TEntity entity,
         IEnumerable<Type>? ignoredEntityTypes,
-        CancellationToken cancellationToken);
+        CancellationToken cancellationToken = default);
 }

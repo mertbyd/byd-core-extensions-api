@@ -11,13 +11,12 @@ namespace Byd.CoreExtensions.Entities.ModuleSettings;
 // sistemdeki gorevi: Is kurallarini ModuleSettingManager'a birakan veri kabugudur. Satirin kimligi ModuleName ile TenantId bilesimidir; ayni modulun host satiri ile tenant satiri yan yana yasar.
 public class ModuleSetting : AuditedAggregateRoot<Guid>
 {
-    public string ModuleName { get; internal set; } = default!;
-
     // Satirin gecerli oldugu kapsam; null ise host (tum tenant'lar icin gecerli) satiridir.
     // Bilerek IMultiTenant degildir: ABP'nin global filtresi izolasyon uygular ve tenant istegi
     // sirasinda host satirini gizler; bu tablonun sozlesmesi ise izolasyon degil, tenant satiri
     // yoksa host satirina dusen bir cozumleme zinciridir.
     public Guid? TenantId { get; internal set; }
+    public string ModuleName { get; internal set; } = default!;
     public bool IsEnabled { get; internal set; }
     public int TtlSeconds { get; internal set; } = ModuleSettingConsts.DefaultTtlSeconds;
     public bool RateLimitEnabled { get; internal set; }

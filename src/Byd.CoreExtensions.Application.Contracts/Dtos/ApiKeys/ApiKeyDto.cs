@@ -10,9 +10,9 @@ namespace Byd.CoreExtensions.Dtos.ApiKeys;
 public class ApiKeyDto
 {
     public Guid Id { get; set; }
-    public string Name { get; set; } = default!;
-    public DateTime? ExpiresAt { get; set; }
     public Guid? TenantId { get; set; }
     public Guid? OrganizationId { get; set; }
+    public string Name { get; set; } = default!;
+    public DateTime? ExpiresAt { get; set; }
     public DateTime CreationTime { get; set; }
 }

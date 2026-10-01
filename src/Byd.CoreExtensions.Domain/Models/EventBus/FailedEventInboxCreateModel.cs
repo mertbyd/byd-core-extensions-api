@@ -11,9 +11,9 @@ public sealed class FailedEventInboxCreateModel
 {
     public string MessageId { get; set; } = default!;
     public string EventName { get; set; } = default!;
-    public byte[] EventData { get; set; } = default!;
     public string OwnerModuleName { get; set; } = default!;
     public string OwnerEnvironmentName { get; set; } = default!;
     public string? ExceptionMessage { get; set; }
     public string? ExceptionStackTrace { get; set; }
+    public byte[] EventData { get; set; } = default!;
 }

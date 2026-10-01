@@ -19,15 +19,15 @@ public interface IBulkRepository<TEntity> : IRepository<TEntity>, IScopedDepende
     Task BulkInsertManyAsync(
         IEnumerable<TEntity> entities,
         int? batchSize,
-        CancellationToken cancellationToken);
+        CancellationToken cancellationToken = default);
     // Verilen kayitlari toplu olarak gunceller; batchSize bos birakilirsa BulkOperationConsts.DefaultBatchSize kullanilir.
     Task BulkUpdateManyAsync(
         IEnumerable<TEntity> entities,
         int? batchSize,
-        CancellationToken cancellationToken);
+        CancellationToken cancellationToken = default);
     // Verilen kayitlari toplu olarak siler; batchSize bos birakilirsa BulkOperationConsts.DefaultBatchSize kullanilir.
     Task BulkDeleteManyAsync(
         IEnumerable<TEntity> entities,
         int? batchSize,
-        CancellationToken cancellationToken);
+        CancellationToken cancellationToken = default);
 }

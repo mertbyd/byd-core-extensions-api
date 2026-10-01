@@ -14,30 +14,33 @@ using Volo.Abp.MultiTenancy;
 namespace Byd.CoreExtensions.ApiKeys;
 
 /// <summary>
-/// Isaretli endpoint'lere gelen istegin API anahtarini dogrular ve istegi anahtarin tenant baglaminda calistirir.
+/// Isaretli endpoint'lere gelen istegin API anahtarini dogrular ve istegi anahtarin kapsaminda calistirir.
 /// </summary>
-// islevi: Endpoint [RequireApiKey] tasiyorsa header'daki anahtari store uzerinden dogrular; gecerliyse istek baglamini doldurup tenant'i anahtara gore degistirir, degilse localize 401 ile keser.
-// sistemdeki gorevi: API anahtari korumasinin tek uygulama noktasi; resource filter oldugu icin acilan tenant kapsami model binding, action ve result asamalarinin tamamini kapsar. Organizasyon kimligi kapsam acmaz, ICurrentApiKey uzerinden okunur.
+// islevi: Endpoint [RequireApiKey] tasiyorsa header'daki anahtari store uzerinden dogrular; gecerliyse istek baglamini doldurup tenant ve organizasyon kapsamini anahtara gore degistirir, degilse localize 401 ile keser.
+// sistemdeki gorevi: API anahtari korumasinin tek uygulama noktasi; resource filter oldugu icin acilan kapsamlar model binding, action ve result asamalarinin tamamini kapsar.
 public class ApiKeyValidationFilter : IAsyncResourceFilter, ITransientDependency
 {
     private readonly IApiKeyStore _apiKeyStore;
     private readonly CurrentApiKey _currentApiKey;
     private readonly ICurrentTenant _currentTenant;
+    private readonly ICurrentOrganization _currentOrganization;
     private readonly IStringLocalizer<CoreExtensionsResource> _localizer;
 
     public ApiKeyValidationFilter(
         IApiKeyStore apiKeyStore,
         CurrentApiKey currentApiKey,
         ICurrentTenant currentTenant,
+        ICurrentOrganization currentOrganization,
         IStringLocalizer<CoreExtensionsResource> localizer)
     {
         _apiKeyStore = apiKeyStore;
         _currentApiKey = currentApiKey;
         _currentTenant = currentTenant;
+        _currentOrganization = currentOrganization;
         _localizer = localizer;
     }
 
-    // Endpoint anahtar gerektirmiyorsa dokunmadan gecer; gerektiriyorsa dogrular ve istegin kalanini anahtarin tenant baglaminda yurutur.
+    // Endpoint anahtar gerektirmiyorsa dokunmadan gecer; gerektiriyorsa dogrular ve istegin kalanini anahtarin kapsaminda yurutur.
     public async Task OnResourceExecutionAsync(ResourceExecutingContext context, ResourceExecutionDelegate next)
     {
         if (context.HttpContext.GetEndpoint()?.Metadata.GetMetadata<RequireApiKeyAttribute>() is null)
@@ -55,8 +58,11 @@ public class ApiKeyValidationFilter : IAsyncResourceFilter, ITransientDependency
         }
         var apiKey = result.ApiKey!;
         _currentApiKey.Set(apiKey);
-        // Anahtar hangi tenant'a aitse istegin kalani o tenant olarak calisir; tenant bos ise baglam host kalir.
+        // Istegin kalani anahtarin tenant ve organizasyon kapsaminda calisir; alanlar bos ise kapsam acilmamis
+        // sayilir. Anahtarin kendi kaydi bu filtreye takilmaz: anahtar istege kapsam bilgisi olmadan gelir ve
+        // kapsami zaten kendisi belirler.
         using (_currentTenant.Change(apiKey.TenantId))
+        using (_currentOrganization.Change(apiKey.OrganizationId))
         {
             await next();
         }

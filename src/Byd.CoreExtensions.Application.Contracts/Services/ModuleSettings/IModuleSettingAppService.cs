@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using Byd.CoreExtensions.Dtos.ModuleSettings;
 using Volo.Abp.Application.Services;
@@ -14,26 +15,26 @@ namespace Byd.CoreExtensions.Services.ModuleSettings;
 public interface IModuleSettingAppService : IApplicationService
 {
     // Kimligi verilen modul ayarini getirir.
-    Task<ModuleSettingDto> GetAsync(Guid id);
+    Task<ModuleSettingDto> GetAsync(Guid id, CancellationToken cancellationToken = default);
 
     // Kimligi verilen modul ayarinin yalniz rate limit alanlarini getirir.
-    Task<ModuleSettingRateLimitDto> GetRateLimitAsync(Guid id);
+    Task<ModuleSettingRateLimitDto> GetRateLimitAsync(Guid id, CancellationToken cancellationToken = default);
 
     // Kimligi verilen modul ayarinin yalniz idempotency alanlarini getirir.
-    Task<ModuleSettingIdempotencyDto> GetIdempotencyAsync(Guid id);
+    Task<ModuleSettingIdempotencyDto> GetIdempotencyAsync(Guid id, CancellationToken cancellationToken = default);
 
     // Kimligi verilen modul ayarinin yalniz olay kutusu alanlarini getirir.
-    Task<ModuleSettingEventBoxDto> GetEventBoxAsync(Guid id);
+    Task<ModuleSettingEventBoxDto> GetEventBoxAsync(Guid id, CancellationToken cancellationToken = default);
 
     // Tum modul ayari kayitlarini getirir.
-    Task<List<ModuleSettingDto>> GetListAsync();
+    Task<List<ModuleSettingDto>> GetListAsync(CancellationToken cancellationToken = default);
 
     // Dogrulanmis girdiden yeni modul ayari olusturur.
-    Task<ModuleSettingDto> CreateAsync(CreateModuleSettingDto input);
+    Task<ModuleSettingDto> CreateAsync(CreateModuleSettingDto input, CancellationToken cancellationToken = default);
 
     // Kimligi verilen modul ayarinin degistirilebilir alanlarini gunceller.
-    Task<ModuleSettingDto> UpdateAsync(Guid id, UpdateModuleSettingDto input);
+    Task<ModuleSettingDto> UpdateAsync(Guid id, UpdateModuleSettingDto input, CancellationToken cancellationToken = default);
 
     // Kimligi verilen modul ayarini siler.
-    Task DeleteAsync(Guid id);
+    Task DeleteAsync(Guid id, CancellationToken cancellationToken = default);
 }

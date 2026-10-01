@@ -10,8 +10,8 @@ namespace Byd.CoreExtensions.Dtos.ModuleSettings;
 public class ModuleSettingIdempotencyDto
 {
     public Guid Id { get; set; }
-    public string ModuleName { get; set; } = default!;
     public Guid? TenantId { get; set; }
+    public string ModuleName { get; set; } = default!;
     public bool IsEnabled { get; set; }
     public bool IdempotencyEnabled { get; set; }
     public int IdempotencyTtlSeconds { get; set; }
