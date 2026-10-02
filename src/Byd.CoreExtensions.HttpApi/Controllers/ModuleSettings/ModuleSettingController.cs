@@ -2,9 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Byd.CoreExtensions.Consts;
 using Byd.CoreExtensions.Dtos.ModuleSettings;
+using Byd.CoreExtensions.Permissions;
 using Byd.CoreExtensions.Services.ModuleSettings;
 using SystemStandards.Results;
 
@@ -17,7 +19,7 @@ namespace Byd.CoreExtensions.Controllers.ModuleSettings;
 // sistemdeki gorevi: ModuleSetting tam CRUD dikey kesitinin ince HTTP giris noktasidir.
 [ApiController]
 [Route(ModuleSettingRoutes.Root)]
-public class ModuleSettingController : CoreExtensionsController//todo : auth module gelince buraya permisio atılacak şuan test edebilmek için atmadım
+public class ModuleSettingController : CoreExtensionsController
 {
     /// <summary>ModuleSetting AppService'ini lazy cozer.</summary>
     private IModuleSettingAppService AppService =>
@@ -25,12 +27,30 @@ public class ModuleSettingController : CoreExtensionsController//todo : auth mod
 
     /// <summary>
     /// Kimligi verilen modul ayari kaydini getirir.
-    /// Kayit bulunamazsa Manager varlik kontrolu devreye girer ve istek EntityNotFound hata koduyla reddedilir.
     /// </summary>
     /// <param name="id">Getirilecek modul ayari kaydinin benzersiz kimligi.</param>
     /// <param name="cancellationToken">Istek iptal belirteci.</param>
-    /// <returns>Modul adi, TTL suresi ve rate limit alanlariyla birlikte tek modul ayari kaydi.</returns>
+    /// <remarks>
+    /// Response {
+    ///   Id                            (Guid)      → Kayit Id'si
+    ///   TenantId                      (Guid?)     → Satirin tenant'i; bos ise host satiridir ve tum tenant'lar icin gecerlidir
+    ///   ModuleName                    (string)    → Ayarin ait oldugu modul adi
+    ///   IsEnabled                     (bool)      → Modul ayari satirinin etkin olup olmadigi
+    ///   TtlSeconds                    (int)       → Ayar satirinin onbellekte tutuldugu sure (saniye); degisiklik en gec bu sure sonunda etkili olur
+    ///   RateLimitEnabled              (bool)      → Rate limit acik mi
+    ///   RateLimitPermitLimit          (int)       → Pencere basina izin verilen istek sayisi
+    ///   RateLimitWindowSeconds        (int)       → Rate limit penceresi (saniye)
+    ///   IdempotencyEnabled            (bool)      → Mukerrer istek korumasi acik mi
+    ///   IdempotencyTtlSeconds         (int)       → Ayni istegin reddedildigi sure (saniye)
+    ///   EventBoxEnabled               (bool)      → Olay kutusu (inbox/outbox) acik mi
+    ///   FailedEventRetryUnlimited     (bool)      → Basarisiz olay suresiz mi yeniden denenir
+    ///   FailedEventRetryWindowSeconds (int)       → Basarisiz olayin yeniden denendigi pencere (saniye)
+    ///   LastModificationTime          (DateTime?) → Son guncelleme zamani
+    /// }
+    /// Kayit bulunamazsa Manager varlik kontrolu devreye girer ve istek EntityNotFound hata koduyla reddedilir.
+    /// </remarks>
     [HttpGet(ModuleSettingRoutes.ById)]
+    [Authorize(CoreExtensionsPermissions.ModuleSettings.View)]
     public virtual async Task<Result<ModuleSettingDto>> GetAsync(Guid id, CancellationToken cancellationToken = default)
     {
         var result = await AppService.GetAsync(id, cancellationToken);
@@ -41,8 +61,21 @@ public class ModuleSettingController : CoreExtensionsController//todo : auth mod
     /// </summary>
     /// <param name="id">Rate limit alanlari okunacak modul ayari kaydinin benzersiz kimligi.</param>
     /// <param name="cancellationToken">Istek iptal belirteci.</param>
-    /// <returns>Modul anahtarlari ve rate limit ayarlarini iceren cevap.</returns>
+    /// <remarks>
+    /// Response {
+    ///   Id                     (Guid)   → Kayit Id'si
+    ///   TenantId               (Guid?)  → Satirin tenant'i; bos ise host satiridir ve tum tenant'lar icin gecerlidir
+    ///   ModuleName             (string) → Ayarin ait oldugu modul adi
+    ///   IsEnabled              (bool)   → Modul ayari satirinin etkin olup olmadigi
+    ///   TtlSeconds             (int)    → Ayar satirinin onbellekte tutuldugu sure (saniye); degisiklik en gec bu sure sonunda etkili olur
+    ///   RateLimitEnabled       (bool)   → Rate limit acik mi
+    ///   RateLimitPermitLimit   (int)    → Pencere basina izin verilen istek sayisi
+    ///   RateLimitWindowSeconds (int)    → Rate limit penceresi (saniye)
+    /// }
+    /// Idempotency ve olay kutusu alanlarini tasimaz.
+    /// </remarks>
     [HttpGet(ModuleSettingRoutes.RateLimitById)]
+    [Authorize(CoreExtensionsPermissions.ModuleSettings.View)]
     public virtual async Task<Result<ModuleSettingRateLimitDto>> GetRateLimitAsync(Guid id, CancellationToken cancellationToken = default)
     {
         var result = await AppService.GetRateLimitAsync(id, cancellationToken);
@@ -53,8 +86,19 @@ public class ModuleSettingController : CoreExtensionsController//todo : auth mod
     /// </summary>
     /// <param name="id">Idempotency alanlari okunacak modul ayari kaydinin benzersiz kimligi.</param>
     /// <param name="cancellationToken">Istek iptal belirteci.</param>
-    /// <returns>Modul anahtarlari ve idempotency ayarlarini iceren cevap.</returns>
+    /// <remarks>
+    /// Response {
+    ///   Id                    (Guid)   → Kayit Id'si
+    ///   TenantId              (Guid?)  → Satirin tenant'i; bos ise host satiridir ve tum tenant'lar icin gecerlidir
+    ///   ModuleName            (string) → Ayarin ait oldugu modul adi
+    ///   IsEnabled             (bool)   → Modul ayari satirinin etkin olup olmadigi
+    ///   IdempotencyEnabled    (bool)   → Mukerrer istek korumasi acik mi
+    ///   IdempotencyTtlSeconds (int)    → Ayni istegin reddedildigi sure (saniye)
+    /// }
+    /// Rate limit ve olay kutusu alanlarini tasimaz.
+    /// </remarks>
     [HttpGet(ModuleSettingRoutes.IdempotencyById)]
+    [Authorize(CoreExtensionsPermissions.ModuleSettings.View)]
     public virtual async Task<Result<ModuleSettingIdempotencyDto>> GetIdempotencyAsync(Guid id, CancellationToken cancellationToken = default)
     {
         var result = await AppService.GetIdempotencyAsync(id, cancellationToken);
@@ -65,8 +109,20 @@ public class ModuleSettingController : CoreExtensionsController//todo : auth mod
     /// </summary>
     /// <param name="id">Olay kutusu alanlari okunacak modul ayari kaydinin benzersiz kimligi.</param>
     /// <param name="cancellationToken">Istek iptal belirteci.</param>
-    /// <returns>Modul anahtarlari ve olay kutusu ayarlarini iceren cevap.</returns>
+    /// <remarks>
+    /// Response {
+    ///   Id                            (Guid)   → Kayit Id'si
+    ///   TenantId                      (Guid?)  → Satirin tenant'i; bos ise host satiridir ve tum tenant'lar icin gecerlidir
+    ///   ModuleName                    (string) → Ayarin ait oldugu modul adi
+    ///   IsEnabled                     (bool)   → Modul ayari satirinin etkin olup olmadigi
+    ///   EventBoxEnabled               (bool)   → Olay kutusu (inbox/outbox) acik mi
+    ///   FailedEventRetryUnlimited     (bool)   → Basarisiz olay suresiz mi yeniden denenir
+    ///   FailedEventRetryWindowSeconds (int)    → Basarisiz olayin yeniden denendigi pencere (saniye)
+    /// }
+    /// Rate limit ve idempotency alanlarini tasimaz.
+    /// </remarks>
     [HttpGet(ModuleSettingRoutes.EventBoxById)]
+    [Authorize(CoreExtensionsPermissions.ModuleSettings.View)]
     public virtual async Task<Result<ModuleSettingEventBoxDto>> GetEventBoxAsync(Guid id, CancellationToken cancellationToken = default)
     {
         var result = await AppService.GetEventBoxAsync(id, cancellationToken);
@@ -74,11 +130,14 @@ public class ModuleSettingController : CoreExtensionsController//todo : auth mod
     }
     /// <summary>
     /// Kayitli tum modul ayarlarini tek listede getirir.
-    /// Liste sayfalanmaz; tablo her modul icin tek satir tutan kucuk bir yapilandirma kayit defteridir.
     /// </summary>
     /// <param name="cancellationToken">Istek iptal belirteci.</param>
-    /// <returns>Her modulun ayar kaydini iceren tam liste; kayit yoksa bos liste.</returns>
+    /// <remarks>
+    /// Response elemanlari tek kayit ucuyla ayni alanlari tasir; kayit yoksa bos liste doner.
+    /// Liste sayfalanmaz; tablo her modul icin tek satir tutan kucuk bir yapilandirma kayit defteridir.
+    /// </remarks>
     [HttpGet]
+    [Authorize(CoreExtensionsPermissions.ModuleSettings.View)]
     public virtual async Task<Result<List<ModuleSettingDto>>> GetListAsync(CancellationToken cancellationToken = default)
     {
         var result = await AppService.GetListAsync(cancellationToken);
@@ -86,12 +145,29 @@ public class ModuleSettingController : CoreExtensionsController//todo : auth mod
     }
     /// <summary>
     /// Yeni bir modul icin ayar kaydi olusturur.
-    /// Modul adi Manager tarafinda normalize edilir ve ayni adla ikinci kayit acilmasi engellenir.
     /// </summary>
     /// <param name="input">Modul adi, TTL suresi ve rate limit varsayilanlarini tasiyan create istegi.</param>
     /// <param name="cancellationToken">Istek iptal belirteci.</param>
-    /// <returns>Uretilen kimlik ve kalici hale gelmis alanlarla birlikte yeni modul ayari kaydi.</returns>
+    /// <remarks>
+    /// Request {
+    ///   TenantId                      (Guid?)  → Satirin tenant'i; bos ise host satiridir ve tum tenant'lar icin gecerlidir
+    ///   ModuleName                    (string) → Ayarin ait oldugu modul adi
+    ///   IsEnabled                     (bool)   → Modul ayari satirinin etkin olup olmadigi
+    ///   TtlSeconds                    (int)    → Ayar satirinin onbellekte tutuldugu sure, 1-86400 saniye
+    ///   RateLimitEnabled              (bool)   → Rate limit acik mi
+    ///   RateLimitPermitLimit          (int)    → Pencere basina izin verilen istek sayisi, 1-1000000
+    ///   RateLimitWindowSeconds        (int)    → Rate limit penceresi, 1-86400 saniye
+    ///   IdempotencyEnabled            (bool)   → Mukerrer istek korumasi acik mi
+    ///   IdempotencyTtlSeconds         (int)    → Ayni istegin reddedildigi sure, 1-86400 saniye
+    ///   EventBoxEnabled               (bool)   → Olay kutusu (inbox/outbox) acik mi
+    ///   FailedEventRetryUnlimited     (bool)   → Basarisiz olay suresiz mi yeniden denenir
+    ///   FailedEventRetryWindowSeconds (int)    → Basarisiz olayin yeniden denendigi pencere, 1-604800 saniye
+    /// }
+    /// Response olusan kaydi tek kayit ucuyla ayni alanlarla tasir.
+    /// Modul adi Manager tarafinda normalize edilir ve ayni adla ikinci kayit acilmasi engellenir.
+    /// </remarks>
     [HttpPost]
+    [Authorize(CoreExtensionsPermissions.ModuleSettings.Manage)]
     public virtual async Task<Result<ModuleSettingDto>> CreateAsync(
         [FromBody] CreateModuleSettingDto input,
         CancellationToken cancellationToken = default)
@@ -101,13 +177,17 @@ public class ModuleSettingController : CoreExtensionsController//todo : auth mod
     }
     /// <summary>
     /// Kimligi verilen modul ayari kaydinin tum alanlarini gunceller.
-    /// Rate limit alanlarindaki degisiklik uygulama yeniden baslatilmadan, en gec kaydin TTL suresi kadar sonra etkili olur.
     /// </summary>
     /// <param name="id">Guncellenecek modul ayari kaydinin benzersiz kimligi.</param>
     /// <param name="input">Kaydin yeni modul adi, TTL suresi ve rate limit degerlerini tasiyan update istegi.</param>
     /// <param name="cancellationToken">Istek iptal belirteci.</param>
-    /// <returns>Guncel alanlari ve yeni son degistirilme zamanini tasiyan modul ayari kaydi.</returns>
+    /// <remarks>
+    /// Request olusturma istegiyle ayni alanlari tasir ve kaydin tum alanlarini degistirir; kismi guncelleme yapmaz.
+    /// Response guncel kaydi tek kayit ucuyla ayni alanlarla tasir.
+    /// Rate limit alanlarindaki degisiklik uygulama yeniden baslatilmadan, en gec kaydin TTL suresi kadar sonra etkili olur.
+    /// </remarks>
     [HttpPut(ModuleSettingRoutes.ById)]
+    [Authorize(CoreExtensionsPermissions.ModuleSettings.Manage)]
     public virtual async Task<Result<ModuleSettingDto>> UpdateAsync(
         Guid id,
         [FromBody] UpdateModuleSettingDto input,
@@ -118,12 +198,15 @@ public class ModuleSettingController : CoreExtensionsController//todo : auth mod
     }
     /// <summary>
     /// Kimligi verilen modul ayari kaydini kalici olarak siler.
-    /// Silinen modul bir sonraki tazelemede satirsiz kalir ve rate limit'i sabit varsayilanlara duser.
     /// </summary>
     /// <param name="id">Silinecek modul ayari kaydinin benzersiz kimligi.</param>
     /// <param name="cancellationToken">Istek iptal belirteci.</param>
-    /// <returns>Govdesiz basari sonucu.</returns>
+    /// <remarks>
+    /// Basarili istekte iceriksiz cevap dondurulur; silinen kayit geri alinmaz.
+    /// Silinen modul bir sonraki tazelemede satirsiz kalir ve rate limit'i sabit varsayilanlara duser.
+    /// </remarks>
     [HttpDelete(ModuleSettingRoutes.ById)]
+    [Authorize(CoreExtensionsPermissions.ModuleSettings.Manage)]
     public virtual async Task<Result> DeleteAsync(Guid id, CancellationToken cancellationToken = default)
     {
         await AppService.DeleteAsync(id, cancellationToken);

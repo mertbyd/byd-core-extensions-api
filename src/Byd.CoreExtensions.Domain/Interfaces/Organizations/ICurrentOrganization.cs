@@ -19,6 +19,12 @@ public interface ICurrentOrganization
     // Kapsamdaki organizasyonun adi; kapsam ad tasimiyorsa null.
     string? Name { get; }
 
+    // Kapsamdaki organizasyonun ust organizasyon kimligi; kok organizasyonsa veya ust kayit yoksa null.
+    Guid? ParentId { get; }
+
+    // Kapsamdaki organizasyonun ust organizasyon adi; kok organizasyonsa veya ust kayit yoksa null.
+    string? ParentName { get; }
+
     // Verilen kapsami blok suresince yururluge koyar; blok bitince onceki kapsam geri doner.
-    IDisposable Change(Guid? id, string? name = null);
+    IDisposable Change(Guid? id, string? name = null, Guid? parentId = null, string? parentName = null);
 }

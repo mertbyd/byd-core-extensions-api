@@ -1,21 +1,28 @@
 using System;
 using System.IO;
 using System.Reflection;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi;
+using Byd.AuthManagement.EntityFrameworkCore;
 using Byd.CoreExtensions.Consts;
 using Byd.CoreExtensions.EntityFrameworkCore;
 using Byd.CoreExtensions.Extensions;
+using Byd.CoreExtensions.MultiTenancy;
 using Byd.CoreExtensions.Options;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using System.Threading.Tasks;
 using Volo.Abp;
+using Volo.Abp.AspNetCore.Authentication.JwtBearer;
 using Volo.Abp.AspNetCore.Mvc;
+using Volo.Abp.AspNetCore.MultiTenancy;
 using Volo.Abp.AspNetCore.Serilog;
 using Volo.Abp.Autofac;
 using Volo.Abp.Modularity;
+using Volo.Abp.MultiTenancy;
 using Volo.Abp.Swashbuckle;
 
 namespace Byd.CoreExtensions;
@@ -24,11 +31,15 @@ namespace Byd.CoreExtensions;
     typeof(CoreExtensionsApplicationModule),
     typeof(CoreExtensionsEntityFrameworkCoreModule),
     typeof(CoreExtensionsHttpApiModule),
+    typeof(AuthManagementEntityFrameworkCoreModule),
     typeof(AbpAspNetCoreMvcModule),
+    typeof(AbpAspNetCoreMultiTenancyModule),
+    typeof(AbpAspNetCoreAuthenticationJwtBearerModule),
     typeof(AbpAutofacModule),
     typeof(AbpAspNetCoreSerilogModule),
     typeof(AbpSwashbuckleModule))]
-// islevi: CoreExtensions HTTP hostunun temel ABP modul kompozisyonunu kurar.
+// islevi: CoreExtensions HTTP hostunun temel ABP modul kompozisyonunu kurar. Izin ve feature degerleri auth
+// EF paketi uzerinden AuthManagement baglanti dizesindeki auth veritabanindan okunur.
 // sistemdeki gorevi: Core yetenekleri eklenmeden once API, Swagger ve middleware omurgasini calistirir.
 public class CoreExtensionsHttpApiHostModule : AbpModule
 {
@@ -51,6 +62,14 @@ public class CoreExtensionsHttpApiHostModule : AbpModule
                 .Replace(".HttpApi.Host", string.Empty);
             options.EnvironmentName = environmentName;
         });
+
+        // Tenant token'daki claim'den cozulur; kapali kalirsa her istek host kapsaminda calisir ve host izinleri gecerli olur.
+        Configure<AbpMultiTenancyOptions>(options =>
+        {
+            options.IsEnabled = MultiTenancyConsts.IsEnabled;
+        });
+
+        ConfigureAuthentication(context);
         context.Services.AddAbpSwaggerGen(options =>
         {
             options.SwaggerDoc(
@@ -61,8 +80,34 @@ public class CoreExtensionsHttpApiHostModule : AbpModule
                     Version = SwaggerConsts.DocumentName
                 });
             options.CustomSchemaIds(type => type.FullName);
+            // Auth sunucusunun login ucunun verdigi access token Swagger'da elle girilir.
+            options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+            {
+                Type = SecuritySchemeType.Http,
+                Scheme = "bearer",
+                BearerFormat = "JWT",
+                In = ParameterLocation.Header
+            });
+            options.AddSecurityRequirement(document => new OpenApiSecurityRequirement
+            {
+                { new OpenApiSecuritySchemeReference("Bearer", document), [] }
+            });
             IncludeXmlDocumentation(options);
         });
+    }
+
+    // Token'i auth sunucusu uretir; bu host imzayi sunucunun yayinladigi anahtarla, audience'i de token'a
+    // yazilan API scope'uyla dogrular.
+    private static void ConfigureAuthentication(ServiceConfigurationContext context)
+    {
+        var configuration = context.Services.GetConfiguration();
+        context.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+            .AddAbpJwtBearer(options =>
+            {
+                options.Authority = configuration["AuthServer:Authority"];
+                options.Audience = configuration["AuthServer:Audience"];
+                options.RequireHttpsMetadata = configuration.GetValue<bool>("AuthServer:RequireHttpsMetadata");
+            });
     }
     // Controller ve DTO XML yorumlarini Swagger dokumanina tasir; dosya uretilmediyse sessizce atlanir.
     private static void IncludeXmlDocumentation(SwaggerGenOptions options)
@@ -92,6 +137,11 @@ public class CoreExtensionsHttpApiHostModule : AbpModule
         }
         app.UseCorrelationId();
         app.UseRouting();
+        app.UseAuthentication();
+        if (MultiTenancyConsts.IsEnabled)
+        {
+            app.UseMultiTenancy();
+        }
         app.UseSwagger();
         app.UseAbpSwaggerUI(options =>
         {
@@ -102,6 +152,8 @@ public class CoreExtensionsHttpApiHostModule : AbpModule
         // cagrilmazsa modul acilista durur. Rate limit'in altinda durur: limiti asan istek govdesi
         // hic okunmadan reddedilsin diye.
         app.UseCoreExtensions();
+        // Organizasyon kapsami core middleware'inde kurulur; yetki kontrolu ondan sonra calisir.
+        app.UseAuthorization();
         app.UseConfiguredEndpoints();
         return Task.CompletedTask;
     }
