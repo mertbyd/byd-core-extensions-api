@@ -38,4 +38,10 @@ public static class GeneralExceptionCodes
 
     // Rate limit asildi; istemci pencere/kota dolduktan sonra yeniden denemelidir.
     public const string TooManyRequests = ExceptionCodeConsts.GeneralGroup + "0010";
+
+    // Kullanicinin rolunde istenen islem icin izin yok.
+    public const string PermissionNotGranted = ExceptionCodeConsts.GeneralGroup + "0011";
+
+    // Izin rolde var ama bagli oldugu feature kullanicinin kapsaminda acik degil.
+    public const string FeatureNotEnabled = ExceptionCodeConsts.GeneralGroup + "0012";
 }
