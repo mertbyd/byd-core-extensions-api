@@ -21,6 +21,7 @@ public partial class CoreExtensionsPermissionDefinitionProvider : PermissionDefi
         AddModuleSettingsPermissions(group);
         AddApiKeysPermissions(group);
         AddFailedEventInboxesPermissions(group);
+        AddEmailTemplatesPermissions(group);
     }
 
     // Localization anahtarini modul kaynagina baglar.

@@ -33,6 +33,9 @@ public static class CoreExtensionsLocalizationConsts
         public const string ApiKeysManage = "Permission:ApiKeys.Manage";
         public const string FailedEventInboxes = "Permission:FailedEventInboxes";
         public const string FailedEventInboxesView = "Permission:FailedEventInboxes.View";
+        public const string EmailTemplates = "Permission:EmailTemplates";
+        public const string EmailTemplatesView = "Permission:EmailTemplates.View";
+        public const string EmailTemplatesManage = "Permission:EmailTemplates.Manage";
     }
 
     /// <summary>

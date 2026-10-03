@@ -1,5 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Volo.Abp.Data;
+using Byd.CoreExtensions.Entities.EmailEvents;
+using Byd.CoreExtensions.Entities.EmailTemplates;
 using Byd.CoreExtensions.Entities.EventBus;
 using Byd.CoreExtensions.Entities.ModuleSettings;
 using Volo.Abp.EntityFrameworkCore;
@@ -26,6 +28,10 @@ public class CoreExtensionsDbContext : AbpDbContext<CoreExtensionsDbContext>, IC
     public DbSet<ModuleSetting> ModuleSettings { get; set; } = default!;
 
     public DbSet<FailedEventInbox> FailedEventInboxes { get; set; } = default!;
+
+    public DbSet<EmailEvent> EmailEvents { get; set; } = default!;
+
+    public DbSet<EmailTemplate> EmailTemplates { get; set; } = default!;
 
     // Kutu kayitlarinin entity'leri cerceveden gelir, bu depoda tanimli degildir.
     // Tablo adi ve semasi Configurations/EventBus altindaki konfigurasyonlarda belirlenir.

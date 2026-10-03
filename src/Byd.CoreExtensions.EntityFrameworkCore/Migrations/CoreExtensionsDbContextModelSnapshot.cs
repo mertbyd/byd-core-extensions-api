@@ -74,6 +74,126 @@ namespace Byd.CoreExtensions.Migrations
                     b.ToView(null, (string)null);
                 });
 
+            modelBuilder.Entity("Byd.CoreExtensions.Entities.EmailEvents.EmailEvent", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<int?>("Code")
+                        .HasColumnType("integer")
+                        .HasColumnName("code");
+
+                    b.Property<DateTime>("CreationTime")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("creation_time");
+
+                    b.Property<Guid?>("CreatorId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("creator_id");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("character varying(128)")
+                        .HasColumnName("name");
+
+                    b.HasKey("Id")
+                        .HasName("pk_core_extensions_email_events");
+
+                    b.HasIndex("Name")
+                        .IsUnique()
+                        .HasDatabaseName("IX_EmailEvents_Name");
+
+                    b.ToTable("CoreExtensionsEmailEvents", "core_extension");
+
+                    b.ToView(null, (string)null);
+                });
+
+            modelBuilder.Entity("Byd.CoreExtensions.Entities.EmailTemplates.EmailTemplate", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<string>("Body")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("body");
+
+                    b.Property<string>("ConcurrencyStamp")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .HasMaxLength(40)
+                        .HasColumnType("character varying(40)")
+                        .HasColumnName("concurrency_stamp");
+
+                    b.Property<DateTime>("CreationTime")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("creation_time");
+
+                    b.Property<Guid?>("CreatorId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("creator_id");
+
+                    b.Property<string>("CultureName")
+                        .IsRequired()
+                        .HasMaxLength(10)
+                        .HasColumnType("character varying(10)")
+                        .HasColumnName("culture_name");
+
+                    b.Property<Guid>("EmailEventId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("email_event_id");
+
+                    b.Property<string>("ExtraProperties")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("extra_properties");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_active");
+
+                    b.Property<DateTime?>("LastModificationTime")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("last_modification_time");
+
+                    b.Property<Guid?>("LastModifierId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("last_modifier_id");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("character varying(128)")
+                        .HasColumnName("name");
+
+                    b.Property<Guid?>("OrganizationId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("organization_id");
+
+                    b.Property<string>("Subject")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)")
+                        .HasColumnName("subject");
+
+                    b.Property<Guid?>("TenantId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("tenant_id");
+
+                    b.HasKey("Id")
+                        .HasName("pk_core_extensions_email_templates");
+
+                    b.HasIndex("EmailEventId", "CultureName", "TenantId", "OrganizationId")
+                        .HasDatabaseName("IX_EmailTemplates_EmailEventId_CultureName_TenantId_OrganizationId");
+
+                    b.ToTable("CoreExtensionsEmailTemplates", "core_extension");
+
+                    b.ToView(null, (string)null);
+                });
+
             modelBuilder.Entity("Byd.CoreExtensions.Entities.EventBus.FailedEventInbox", b =>
                 {
                     b.Property<Guid>("Id")
@@ -388,6 +508,18 @@ namespace Byd.CoreExtensions.Migrations
                     b.ToTable("EventOutbox", "core_extension");
 
                     b.ToView(null, (string)null);
+                });
+
+            modelBuilder.Entity("Byd.CoreExtensions.Entities.EmailTemplates.EmailTemplate", b =>
+                {
+                    b.HasOne("Byd.CoreExtensions.Entities.EmailEvents.EmailEvent", "EmailEvent")
+                        .WithMany()
+                        .HasForeignKey("EmailEventId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("fk_core_extensions_email_templates_core_extensions_emai");
+
+                    b.Navigation("EmailEvent");
                 });
 #pragma warning restore 612, 618
         }
