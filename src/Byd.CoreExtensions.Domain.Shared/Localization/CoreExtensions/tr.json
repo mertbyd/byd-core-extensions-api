@@ -13,6 +13,8 @@
     "CoreExtensions:010008": "Zorunlu bir alan boş bırakıldı.",
     "CoreExtensions:010009": "Gönderilen değer geçerli bir seçenek değil.",
     "CoreExtensions:010010": "Çok fazla istek gönderildi. Lütfen daha sonra tekrar deneyin.",
+    "CoreExtensions:010011": "Bu işlem için yetkiniz yok.",
+    "CoreExtensions:010012": "Bu işlem için gereken '{0}' özelliği kapsamınızda açık değil.",
     "CoreExtensions:040001": "Modül adı zorunludur.",
     "CoreExtensions:040002": "Modül adı 128 karakterden uzun olamaz.",
     "CoreExtensions:040003": "Aynı modül adına sahip bir modül ayarı zaten mevcut.",

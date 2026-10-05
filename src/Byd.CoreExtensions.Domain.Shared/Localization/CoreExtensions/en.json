@@ -13,6 +13,8 @@
     "CoreExtensions:010008": "A required value was not provided.",
     "CoreExtensions:010009": "The provided value is not a valid option.",
     "CoreExtensions:010010": "Too many requests. Please try again later.",
+    "CoreExtensions:010011": "You are not authorized to perform this operation.",
+    "CoreExtensions:010012": "The '{0}' feature required for this operation is not enabled in your scope.",
     "CoreExtensions:040001": "Module name is required.",
     "CoreExtensions:040002": "Module name cannot exceed 128 characters.",
     "CoreExtensions:040003": "A module setting with the same module name already exists.",
