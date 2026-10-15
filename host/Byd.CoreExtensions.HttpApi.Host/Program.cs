@@ -1,10 +1,10 @@
-﻿using System;
+using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Byd.CoreExtensions.SystemLogs;
 using Serilog;
-using Serilog.Events;
 
 namespace Byd.CoreExtensions;
 
@@ -12,23 +12,16 @@ public class Program
 {
     public async static Task<int> Main(string[] args)
     {
+        var builder = WebApplication.CreateBuilder(args);
+        // Ortak log yapilandirmasi; sistem log iscisi ayarlar degisince bu logger'i Elasticsearch hedefiyle yeniden kurar. Bu
+        // yuzden CreateBootstrapLogger ile kurulur ve UseSerilog'a parametresiz baglanir.
         Log.Logger = new LoggerConfiguration()
-#if DEBUG
-            .MinimumLevel.Debug()
-#else
-            .MinimumLevel.Information()
-#endif
-            .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
-            .MinimumLevel.Override("Microsoft.EntityFrameworkCore", LogEventLevel.Warning)
-            .Enrich.FromLogContext()
-            .WriteTo.Async(c => c.File("Logs/logs.txt"))
-            .WriteTo.Async(c => c.Console())
-            .CreateLogger();
+            .ConfigureSystemLog(builder.Environment.EnvironmentName)
+            .CreateBootstrapLogger();
 
         try
         {
             Log.Information("Starting web host.");
-            var builder = WebApplication.CreateBuilder(args);
             builder.Host.AddAppSettingsSecretsJson()
                 .UseAutofac()
                 .UseSerilog();

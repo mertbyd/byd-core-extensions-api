@@ -56,6 +56,11 @@ public class CoreExtensionsEntityFrameworkCoreTestModule : AbpModule
             new DbContextOptionsBuilder<CoreExtensionsDbContext>()
                 .UseSqlite(keepAliveConnection).Options
         ).GetService<IRelationalDatabaseCreator>().CreateTables();
+        // Ayar okumasi tenant ve global degerleri AbpSettings tablosundan okur; tablo ayar context'inin modelindedir.
+        new CoreExtensionsSettingsDbContext(
+            new DbContextOptionsBuilder<CoreExtensionsSettingsDbContext>()
+                .UseSqlite(keepAliveConnection).Options
+        ).GetService<IRelationalDatabaseCreator>().CreateTables();
 
         return connectionString;
     }

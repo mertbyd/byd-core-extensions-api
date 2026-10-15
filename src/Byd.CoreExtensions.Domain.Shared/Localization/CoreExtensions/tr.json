@@ -49,6 +49,8 @@
     "CoreExtensions:050010": "Bu olay ve dil için kullanılabilir bir e-posta şablonu bulunamadı.",
     "CoreExtensions:050011": "Aktif şablon silinemez; önce başka bir şablonu aktif yapın.",
     "CoreExtensions:050012": "Şablon zaten aktif.",
+    "CoreExtensions:060001": "Elasticsearch kapalı; CoreExtensions.Elasticsearch.IsEnabled ayarını açın.",
+    "CoreExtensions:060002": "Elasticsearch toplu yazmada {failedItemCount} belgeyi reddetti.",
     "CoreExtensions:020001": "Bu uç nokta için API anahtarı gereklidir.",
     "CoreExtensions:020002": "Gönderilen API anahtarı geçersiz.",
     "CoreExtensions:020004": "Gönderilen API anahtarının süresi dolmuş.",

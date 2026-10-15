@@ -49,6 +49,8 @@
     "CoreExtensions:050010": "No usable email template was found for this event and culture.",
     "CoreExtensions:050011": "An active template cannot be deleted; activate another template first.",
     "CoreExtensions:050012": "The template is already active.",
+    "CoreExtensions:060001": "Elasticsearch is turned off; enable the CoreExtensions.Elasticsearch.IsEnabled setting.",
+    "CoreExtensions:060002": "Elasticsearch rejected {failedItemCount} document(s) in the bulk write.",
     "CoreExtensions:020001": "An API key is required for this endpoint.",
     "CoreExtensions:020002": "The provided API key is invalid.",
     "CoreExtensions:020004": "The provided API key has expired.",

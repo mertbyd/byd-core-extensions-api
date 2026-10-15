@@ -92,7 +92,7 @@ public static class QueryableExtensions
         return query.Skip(ResolveSkipCount(page, pageSize)).Take(pageSize);
     }
     // Sayfalamayi dogrular ve atlanacak kayit sayisini tasma olmadan hesaplar.
-    private static int ResolveSkipCount(int page, int pageSize)
+    internal static int ResolveSkipCount(int page, int pageSize)
     {
         if (page < DataTablePaging.FirstPage)
             throw PagingException(GeneralExceptionCodes.InvalidPage, DataTableQueryConsts.PageDataKey, page);
@@ -109,7 +109,7 @@ public static class QueryableExtensions
         return new BusinessException(errorCode).WithData(dataKey, value);
     }
     // Filtre modeli tipinin izin listesini cikarir; sonucu tip basina cache'ler.
-    private static IReadOnlyList<(PropertyInfo Property, DataTableAttribute Attribute)> GetFilterFields(Type filteringType)
+    internal static IReadOnlyList<(PropertyInfo Property, DataTableAttribute Attribute)> GetFilterFields(Type filteringType)
     {
         return FilterFieldCache.GetOrAdd(filteringType, static type => type
             .GetProperties(BindingFlags.Public | BindingFlags.Instance)
@@ -240,7 +240,7 @@ public static class QueryableExtensions
         return Expression.Property(Expression.Constant(box, boxType), nameof(QueryValueBox<object>.Value));
     }
     // Ham metni hedef tipe culture-invariant cevirir; beklenen donusum hatasi lokalize InvalidFilterValue olur.
-    private static object ConvertValue(string? raw, Type targetType)
+    internal static object ConvertValue(string? raw, Type targetType)
     {
         var text = raw ?? string.Empty;
         var underlying = Nullable.GetUnderlyingType(targetType) ?? targetType;

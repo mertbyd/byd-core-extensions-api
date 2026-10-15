@@ -1,5 +1,10 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Byd.CoreExtensions.Consts;
+using Byd.CoreExtensions.HealthChecks;
+using Byd.CoreExtensions.Interfaces;
+using Byd.CoreExtensions.Options;
+using Byd.CoreExtensions.Repositories;
 using Volo.Abp.EntityFrameworkCore;
 using Volo.Abp.EntityFrameworkCore.PostgreSql;
 using Volo.Abp.Modularity;
@@ -13,8 +18,10 @@ namespace Byd.CoreExtensions.EntityFrameworkCore;
     typeof(AbpEntityFrameworkCorePostgreSqlModule),
     typeof(AbpSettingManagementEntityFrameworkCoreModule)
 )]
-// islevi: Core DbContext'ini ve PostgreSQL provider'ini ABP'ye kaydeder.
-// sistemdeki gorevi: Core entity ve repository altyapisinin EF Core kompozisyon kokudur.
+// islevi: Core DbContext'ini, PostgreSQL provider'ini, arama repository'sini ve veri depolarinin saglik yoklamalarini ABP'ye
+// kaydeder.
+// sistemdeki gorevi: Core entity, repository ve arama repository altyapisinin veri erisimi kompozisyon kokudur. Elasticsearch
+// baglantisi ayarlardan gelir; Elasticsearch kapali host'ta arama repository'si istenmedikce hicbir sey degismez.
 public class CoreExtensionsEntityFrameworkCoreModule : AbpModule
 {
     // Cerceve tiplerine eklenen alanlarin kaydini acilisin en basinda yapar.
@@ -26,7 +33,7 @@ public class CoreExtensionsEntityFrameworkCoreModule : AbpModule
         CoreExtensionsEfCoreEntityExtensionMappings.Configure();
     }
 
-    // PostgreSQL provider ve varsayilan repository kayitlarini tek yerde kurar.
+    // PostgreSQL provider, varsayilan repository, arama repository'si ve saglik yoklamasi kayitlarini tek yerde kurar.
     public override void ConfigureServices(ServiceConfigurationContext context)
     {
         Configure<AbpDbContextOptions>(options =>
@@ -51,5 +58,22 @@ public class CoreExtensionsEntityFrameworkCoreModule : AbpModule
         });
 
         context.Services.AddCoreExtensionsEventBoxes();
+
+        // Acik generic tip konvansiyonel kayda girmez; her belge tipi bu kayitla dogrudan enjekte edilir.
+        context.Services.AddTransient(typeof(IElasticsearchRepository<,>), typeof(ElasticsearchRepository<,>));
+        AddHealthChecks(context);
+    }
+
+    // Veritabani ve Elasticsearch yoklamalarini host'un sectigi seceneklere gore kaydeder.
+    private static void AddHealthChecks(ServiceConfigurationContext context)
+    {
+        var options = context.Services.ExecutePreConfiguredActions<CoreExtensionsHealthCheckOptions>();
+        if (!options.IsHealthCheckEnabled)
+            return;
+        var builder = context.Services.AddHealthChecks();
+        if (options.IsDatabaseHealthCheckEnabled)
+            builder.AddCheck<DatabaseHealthCheck>(HealthCheckConsts.DatabaseName);
+        if (options.IsElasticsearchHealthCheckEnabled)
+            builder.AddCheck<ElasticsearchHealthCheck>(HealthCheckConsts.ElasticsearchName);
     }
 }

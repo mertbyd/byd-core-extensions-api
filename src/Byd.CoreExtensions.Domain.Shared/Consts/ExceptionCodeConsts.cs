@@ -32,4 +32,7 @@ public static class ExceptionCodeConsts
 
     // E-posta sablonu akisi.
     public const string EmailTemplateGroup = RootNamespace + ":05";
+
+    // Elasticsearch yazma akisi.
+    public const string ElasticsearchGroup = RootNamespace + ":06";
 }
