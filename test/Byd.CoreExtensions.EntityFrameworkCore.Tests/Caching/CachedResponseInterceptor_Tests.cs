@@ -11,8 +11,9 @@ namespace Byd.CoreExtensions.Caching;
 /// Yanit onbellegi interceptor'unun servis metodunu Redis uzerinden sakladigini dogrular.
 /// </summary>
 // islevi: Isaretli metodun ikinci cagrida calismadan dondugunu, girdisi ya da tenant'i farkli cagrinin ayri saklandigini,
-// grup temizlenince yeniden calistigini ve isaretsiz metodun hic saklanmadigini kanitlar.
-// sistemdeki gorevi: Attribute'un AppService metodunda calistiginin guvencesidir.
+// grup temizlenince yeniden calistigini, isaretsiz metodun hic saklanmadigini, taban siniftaki isaretin turetilmis serviste
+// calistigini ve servisin kendi icinden yaptigi cagrinin saklanmadigini kanitlar.
+// sistemdeki gorevi: Attribute'un AppService metodunda ve CRUD tabaninda calistiginin guvencesidir.
 public class CachedResponseInterceptor_Tests : CoreExtensionsEntityFrameworkCoreTestBase
 {
     private readonly ICachedProbeAppService _service;
@@ -44,5 +45,23 @@ public class CachedResponseInterceptor_Tests : CoreExtensionsEntityFrameworkCore
         var first = await _service.GetUncachedAsync(id);
 
         (await _service.GetUncachedAsync(id)).CallNumber.ShouldBeGreaterThan(first.CallNumber);
+    }
+
+    [RedisFact]
+    public async Task Marked_Method_Of_Base_Class_Is_Cached_For_Derived_Service()
+    {
+        var id = Guid.NewGuid();
+        var first = await _service.GetFromBaseAsync(id);
+
+        (await _service.GetFromBaseAsync(id)).CallNumber.ShouldBe(first.CallNumber);
+    }
+
+    [RedisFact]
+    public async Task Marked_Method_Called_From_Inside_The_Service_Is_Not_Cached()
+    {
+        var id = Guid.NewGuid();
+        var first = await _service.GetThroughInnerCallAsync(id);
+
+        (await _service.GetThroughInnerCallAsync(id)).CallNumber.ShouldBeGreaterThan(first.CallNumber);
     }
 }
