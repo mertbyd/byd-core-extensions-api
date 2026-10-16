@@ -48,8 +48,10 @@ dotnet tool install Volo.Abp.Cli --version 10.3.0 --tool-path <tool-directory>
   ayar onbellegi temizligi hepsine ulassin; farkli sistemler farkli on ek kullanir.
 - Onbellekli repository'ler (`EfCachedRepository`) bu repository uzerinden yapilan her yazmada listeyi commit sonrasi siler.
   `CoreExtensions.Caching.IsEntityCachingEnabled` kapaliyken okumalar dogrudan tabloya gider.
-- `[CachedResponse(grup)]` isaretli action'larin yaniti Redis'te saklanir. Anahtar on ek, modul, tenant, grup, organizasyon, kultur,
-  yol ve action girdilerinden kurulur; `IsUserScoped` acikken kullanici da eklenir. `ICachedResponseSource` tasiyan bir entity
+- `[CachedResponse(grup)]` isaretli AppService metotlarinin `Task<T>` sonucu Redis'te saklanir; attribute servis sinifindaki
+  metoda yazilir, interceptor arayuz uzerinden gelen cagriyi yakalar (servisin kendi icinden cagirdigi metot onbellege girmez).
+  Anahtar on ek, modul, tenant, grup, organizasyon, kultur, metot ve girdilerden kurulur; `IsUserScoped` acikken kullanici da
+  eklenir. `ICachedResponseSource` tasiyan bir entity
   degisince adiyla ayni gruptaki yanitlar commit sonrasi silinir; entity disi bir yoldan degisen veri icin
   `ICachedResponseStore.RemoveGroupAsync` cagrilir. `CoreExtensions.Caching.IsResponseCachingEnabled` kapaliyken ya da
   Redis kapaliyken yanit onbellegi devre disidir.

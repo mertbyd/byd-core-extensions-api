@@ -20,7 +20,7 @@ namespace Byd.CoreExtensions.Caching;
 /// </summary>
 // islevi: Anahtari on ek, modul, tenant, grup, organizasyon ve istek ozetinden kurar; yaniti sureli yazar, okur ve bir grubun tum
 // anahtarlarini desenle bulup siler. Redis kapaliysa hicbir sey yapmaz; Redis'e ulasilamazsa istek onbelleksiz devam eder.
-// sistemdeki gorevi: Yanit onbellegi filtresinin ve grup temizligi isteyen modullerin tek Redis kapisi. Desenle silme anahtar
+// sistemdeki gorevi: Yanit onbellegi interceptor'inin ve grup temizligi isteyen modullerin tek Redis kapisi. Desenle silme anahtar
 // biciminin burada sabit olmasina dayanir.
 public class CachedResponseStore(
     IAbpLazyServiceProvider lazyServiceProvider,

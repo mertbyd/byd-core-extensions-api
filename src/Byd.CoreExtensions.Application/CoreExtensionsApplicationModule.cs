@@ -41,6 +41,12 @@ namespace Byd.CoreExtensions;
     )]
 public class CoreExtensionsApplicationModule : AbpModule
 {
+    // [CachedResponse] tasiyan servisleri, kayit aninda yanit onbellegi interceptor'iyla proxy'ler.
+    public override void PreConfigureServices(ServiceConfigurationContext context)
+    {
+        context.Services.OnRegistered(CachedResponseInterceptorRegistrar.RegisterIfNeeded);
+    }
+
     // Rate limit motorunu, API anahtari dogrulamasini ve Mapperly esleyicisini servis koleksiyonuna kaydeder.
     // Mukerrer istek korumasi kendi modulunden konvansiyonel kayitla gelir; burada ayrica kaydedilmez.
     public override void ConfigureServices(ServiceConfigurationContext context)
@@ -63,7 +69,6 @@ public class CoreExtensionsApplicationModule : AbpModule
         context.Services.AddCoreExtensionsRateLimiter();
         context.Services.AddCoreExtensionsApiKeyValidation();
         context.Services.AddCoreExtensionsRedis(context.Services.GetConfiguration());
-        context.Services.AddCoreExtensionsCachedResponses();
         context.Services.AddMapperlyObjectMapper<CoreExtensionsApplicationModule>();
         AddHealthChecks(context);
     }
