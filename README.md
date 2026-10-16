@@ -52,8 +52,8 @@ dotnet tool install Volo.Abp.Cli --version 10.3.0 --tool-path <tool-directory>
   metoda yazilir, interceptor arayuz uzerinden gelen cagriyi yakalar (servisin kendi icinden cagirdigi metot onbellege girmez).
   Anahtar on ek, modul, tenant, grup, organizasyon, kultur, metot ve girdilerden kurulur; `IsUserScoped` acikken kullanici da
   eklenir. `ICachedResponseSource` tasiyan bir entity
-  degisince adiyla ayni gruptaki yanitlar commit sonrasi silinir; entity disi bir yoldan degisen veri icin
-  `ICachedResponseStore.RemoveGroupAsync` cagrilir. `CoreExtensions.Caching.IsResponseCachingEnabled` kapaliyken ya da
+  degisince adiyla ayni gruptaki yanitlar commit sonrasi silinir. Ekleme, guncelleme ve silme metotlarina yazilan
+  `[ClearCachedResponse(grup)]` metot hatasiz bitince grubu yine commit sonrasi siler; hata veren yazma onbellege dokunmaz. `CoreExtensions.Caching.IsResponseCachingEnabled` kapaliyken ya da
   Redis kapaliyken yanit onbellegi devre disidir.
 
 ## Saglik ucu

@@ -16,4 +16,8 @@ public interface ICachedProbeAppService : IApplicationService
     Task<CachedProbeDto> GetFromBaseAsync(Guid id, CancellationToken cancellationToken = default);
 
     Task<CachedProbeDto> GetThroughInnerCallAsync(Guid id, CancellationToken cancellationToken = default);
+
+    Task ChangeAsync(CancellationToken cancellationToken = default);
+
+    Task ChangeAndFailAsync(CancellationToken cancellationToken = default);
 }

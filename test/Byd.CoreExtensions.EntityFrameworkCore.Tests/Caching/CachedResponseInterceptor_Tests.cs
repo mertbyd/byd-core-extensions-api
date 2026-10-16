@@ -12,7 +12,8 @@ namespace Byd.CoreExtensions.Caching;
 /// </summary>
 // islevi: Isaretli metodun ikinci cagrida calismadan dondugunu, girdisi ya da tenant'i farkli cagrinin ayri saklandigini,
 // grup temizlenince yeniden calistigini, isaretsiz metodun hic saklanmadigini, taban siniftaki isaretin turetilmis serviste
-// calistigini ve servisin kendi icinden yaptigi cagrinin saklanmadigini kanitlar.
+// calistigini, servisin kendi icinden yaptigi cagrinin saklanmadigini ve temizlik isaretli yazmanin grubu yalniz basariyla
+// bittiginde sildigini kanitlar.
 // sistemdeki gorevi: Attribute'un AppService metodunda ve CRUD tabaninda calistiginin guvencesidir.
 public class CachedResponseInterceptor_Tests : CoreExtensionsEntityFrameworkCoreTestBase
 {
@@ -36,6 +37,28 @@ public class CachedResponseInterceptor_Tests : CoreExtensionsEntityFrameworkCore
 
         await GetRequiredService<ICachedResponseStore>().RemoveGroupAsync(CachedProbeAppService.Group);
         (await _service.GetAsync(id)).CallNumber.ShouldBeGreaterThan(first.CallNumber);
+    }
+
+    [RedisFact]
+    public async Task Clearing_Method_Removes_Its_Group_After_It_Completes()
+    {
+        var id = Guid.NewGuid();
+        var first = await _service.GetAsync(id);
+
+        await _service.ChangeAsync();
+
+        (await _service.GetAsync(id)).CallNumber.ShouldBeGreaterThan(first.CallNumber);
+    }
+
+    [RedisFact]
+    public async Task Failing_Clearing_Method_Keeps_Its_Group()
+    {
+        var id = Guid.NewGuid();
+        var first = await _service.GetAsync(id);
+
+        await Should.ThrowAsync<InvalidOperationException>(() => _service.ChangeAndFailAsync());
+
+        (await _service.GetAsync(id)).CallNumber.ShouldBe(first.CallNumber);
     }
 
     [RedisFact]
