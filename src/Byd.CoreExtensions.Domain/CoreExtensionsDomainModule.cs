@@ -3,6 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Byd.CoreExtensions.Interfaces;
 using Byd.CoreExtensions.Providers;
 using Volo.Abp.Domain;
+using Volo.Abp.Emailing;
 using Volo.Abp.Modularity;
 using Volo.Abp.SettingManagement;
 using Volo.Abp.Timing;
@@ -12,10 +13,11 @@ namespace Byd.CoreExtensions;
 [DependsOn(
     typeof(AbpDddDomainModule),
     typeof(CoreExtensionsDomainSharedModule),
-    typeof(AbpSettingManagementDomainModule)
+    typeof(AbpSettingManagementDomainModule),
+    typeof(AbpEmailingModule)
 )]
 // islevi: Domain katmaninin ABP modul kompozisyonunu, zaman kaynagi ayarini ve organizasyon kapsaminin
-// saklama noktasini kurar.
+// saklama noktasini kurar. E-posta sablonlari ABP'nin ayarlardan beslenen SMTP gondericisiyle gonderilir.
 // sistemdeki gorevi: Entity denetim alanlarinin hangi DateTimeKind ile uretilecegini belirleyen tek yerdir;
 // kapsam saklama noktasinin tekil kaydi da buradan gelir.
 public class CoreExtensionsDomainModule : AbpModule

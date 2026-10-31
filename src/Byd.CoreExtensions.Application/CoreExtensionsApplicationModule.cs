@@ -3,10 +3,14 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Byd.AntiDuplicate.Middleware;
 using Byd.CoreExtensions.ApiKeys;
+using Byd.CoreExtensions.Caching;
 using Byd.CoreExtensions.Consts;
 using Byd.CoreExtensions.EventBus;
 using Byd.CoreExtensions.ExceptionCodes;
+using Byd.CoreExtensions.HealthChecks;
+using Byd.CoreExtensions.Options;
 using Byd.CoreExtensions.RateLimiting;
+using Byd.CoreExtensions.SystemLogs;
 using Byd.CoreExtensions.Tenants;
 using Volo.Abp;
 using Volo.Abp.Application;
@@ -24,7 +28,7 @@ namespace Byd.CoreExtensions;
 /// Application katmaninin modul kompozisyonunu ve calisma zamani kayitlarini kurar.
 /// </summary>
 // islevi: Application katmaninin ABP modul kompozisyonunu ve servis kayitlarini kurar.
-// sistemdeki gorevi: Korumalari kaydeder, host'un modulu pipeline'ina bagladigini acilista dogrular ve arka plan iscilerini devreye alir. Ayar satirini yazma isi host'un cagirdigi UseCoreExtensions uzantisina aittir. Dagitik olaylar RabbitMQ uzerinden tasinir; baglanti bilgisi host'un RabbitMQ bolumunden gelir.
+// sistemdeki gorevi: Korumalari, Redis onbellegini, yanit onbellegini ve saglik yoklamalarini kaydeder, host'un modulu pipeline'ina bagladigini acilista dogrular ve arka plan iscilerini devreye alir. Ayar satirini yazma isi host'un cagirdigi UseCoreExtensions uzantisina aittir. Dagitik olaylar RabbitMQ uzerinden tasinir; baglanti bilgisi host'un RabbitMQ bolumunden, Redis baglantisi host'un Redis bolumunden gelir.
 [DependsOn(
     typeof(BydAntiDuplicateMiddlewareModule),
     typeof(CoreExtensionsDomainModule),
@@ -37,6 +41,12 @@ namespace Byd.CoreExtensions;
     )]
 public class CoreExtensionsApplicationModule : AbpModule
 {
+    // [CachedResponse] tasiyan servisleri, kayit aninda yanit onbellegi interceptor'iyla proxy'ler.
+    public override void PreConfigureServices(ServiceConfigurationContext context)
+    {
+        context.Services.OnRegistered(CachedResponseInterceptorRegistrar.RegisterIfNeeded);
+    }
+
     // Rate limit motorunu, API anahtari dogrulamasini ve Mapperly esleyicisini servis koleksiyonuna kaydeder.
     // Mukerrer istek korumasi kendi modulunden konvansiyonel kayitla gelir; burada ayrica kaydedilmez.
     public override void ConfigureServices(ServiceConfigurationContext context)
@@ -58,7 +68,22 @@ public class CoreExtensionsApplicationModule : AbpModule
         });
         context.Services.AddCoreExtensionsRateLimiter();
         context.Services.AddCoreExtensionsApiKeyValidation();
+        context.Services.AddCoreExtensionsRedis(context.Services.GetConfiguration());
         context.Services.AddMapperlyObjectMapper<CoreExtensionsApplicationModule>();
+        AddHealthChecks(context);
+    }
+    // RabbitMQ yoklamasini ve Redis aciksa Redis yoklamasini host'un sectigi seceneklere gore kaydeder; veri depolarinin
+    // yoklamalari EntityFrameworkCore modulundedir.
+    private static void AddHealthChecks(ServiceConfigurationContext context)
+    {
+        var options = context.Services.ExecutePreConfiguredActions<CoreExtensionsHealthCheckOptions>();
+        if (!options.IsHealthCheckEnabled)
+            return;
+        var builder = context.Services.AddHealthChecks();
+        if (options.IsRabbitMqHealthCheckEnabled)
+            builder.AddCheck<RabbitMqHealthCheck>(HealthCheckConsts.RabbitMqName);
+        if (options.IsRedisHealthCheckEnabled && RedisConfigurationExtensions.IsRedisEnabled(context.Services.GetConfiguration()))
+            builder.AddCheck<RedisHealthCheck>(HealthCheckConsts.RedisName);
     }
     // Host'un beyanini dogrular ve tazeleme isciyi baslatir; beyan yoksa modulun acilisi burada durur.
     // Isci ilk turunu kendi periyodunda calistirir; acilistaki ilk yukleme UseCoreExtensions
@@ -68,6 +93,7 @@ public class CoreExtensionsApplicationModule : AbpModule
         EnsureHostConfiguredPipeline(context);
         await context.AddBackgroundWorkerAsync<RateLimitStateWorker>();
         await context.AddBackgroundWorkerAsync<FailedEventInboxProcessWorker>();
+        await context.AddBackgroundWorkerAsync<SystemLogWorker>();
     }
 
     // host UseCoreExtensions cagirmadiysa acilisi durdurur; web olmayan host'lari atlar.

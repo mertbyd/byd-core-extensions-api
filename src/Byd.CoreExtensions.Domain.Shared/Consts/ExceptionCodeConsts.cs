@@ -29,4 +29,10 @@ public static class ExceptionCodeConsts
 
     // Modul ayari akisi.
     public const string ModuleSettingGroup = RootNamespace + ":04";
+
+    // E-posta sablonu akisi.
+    public const string EmailTemplateGroup = RootNamespace + ":05";
+
+    // Elasticsearch yazma akisi.
+    public const string ElasticsearchGroup = RootNamespace + ":06";
 }

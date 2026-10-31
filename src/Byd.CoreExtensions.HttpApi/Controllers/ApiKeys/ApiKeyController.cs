@@ -1,9 +1,11 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Byd.CoreExtensions.Consts;
 using Byd.CoreExtensions.Dtos.ApiKeys;
+using Byd.CoreExtensions.Permissions;
 using Byd.CoreExtensions.Services.ApiKeys;
 using SystemStandards.Results;
 
@@ -16,7 +18,7 @@ namespace Byd.CoreExtensions.Controllers.ApiKeys;
 // sistemdeki gorevi: ApiKey dikey kesitinin ince HTTP giris noktasidir; anahtarlar guncellenmez ve silinmez.
 [ApiController]
 [Route(ApiKeyRoutes.Root)]
-public class ApiKeyController : CoreExtensionsController//todo : auth module gelince buraya permission atilacak, su an test edebilmek icin atilmadi
+public class ApiKeyController : CoreExtensionsController
 {
     /// <summary>ApiKey AppService'ini lazy cozer.</summary>
     private IApiKeyAppService AppService =>
@@ -24,13 +26,24 @@ public class ApiKeyController : CoreExtensionsController//todo : auth module gel
 
     /// <summary>
     /// Kimligi verilen API anahtari kaydini getirir.
-    /// Cevap anahtar degerini tasimaz; ham anahtar yalnizca uretme cevabinda bir kez doner.
-    /// Kayit bulunamazsa Manager varlik kontrolu devreye girer ve istek EntityNotFound hata koduyla reddedilir.
     /// </summary>
     /// <param name="id">Getirilecek API anahtari kaydinin benzersiz kimligi.</param>
     /// <param name="cancellationToken">Istek iptal belirteci.</param>
-    /// <returns>Ad, aktiflik, son kullanma ve kapsam alanlariyla tek API anahtari kaydi.</returns>
+    /// <remarks>
+    /// Response {
+    ///   Id             (Guid)      → Kayit Id'si
+    ///   TenantId       (Guid?)     → Anahtarin adina calistigi tenant; bos ise host
+    ///   OrganizationId (Guid?)     → Anahtarin adina calistigi organizasyon
+    ///   Name           (string)    → Anahtarin gorunen adi
+    ///   ExpiresAt      (DateTime?) → Son kullanma zamani; bos ise suresiz
+    ///   CreationTime   (DateTime)  → Olusturulma zamani
+    /// }
+    /// Ham anahtar degeri bu ucta donmez.
+    /// Cevap anahtar degerini tasimaz; ham anahtar yalnizca uretme cevabinda bir kez doner.
+    /// Kayit bulunamazsa Manager varlik kontrolu devreye girer ve istek EntityNotFound hata koduyla reddedilir.
+    /// </remarks>
     [HttpGet(ApiKeyRoutes.ById)]
+    [Authorize(CoreExtensionsPermissions.ApiKeys.View)]
     public virtual async Task<Result<ApiKeyDto>> GetAsync(Guid id, CancellationToken cancellationToken = default)
     {
         var result = await AppService.GetAsync(id, cancellationToken);
@@ -38,13 +51,31 @@ public class ApiKeyController : CoreExtensionsController//todo : auth module gel
     }
     /// <summary>
     /// Yeni bir API anahtari uretir.
-    /// Anahtar degerini sunucu uretir ve yalnizca bu cevapta doner; saklanmasi cagiranin sorumlulugundadir.
-    /// Kaydin tenant ve organizasyon alanlari istegin guncel kapsamindan damgalanir.
     /// </summary>
-    /// <param name="input">Anahtarin adini, aktifligini ve istege bagli son kullanma zamanini tasiyan uretme istegi.</param>
+    /// <param name="input">Anahtarin kapsamini, adini ve istege bagli son kullanma zamanini tasiyan uretme istegi.</param>
     /// <param name="cancellationToken">Istek iptal belirteci.</param>
-    /// <returns>Uretilen kimlik, kapsam alanlari ve tek seferlik ham anahtar degeri.</returns>
+    /// <remarks>
+    /// Request {
+    ///   TenantId       (Guid?)     → Anahtarin adina calisacagi tenant; bos ise host
+    ///   OrganizationId (Guid?)     → Anahtarin adina calisacagi organizasyon
+    ///   Name           (string)    → Anahtarin gorunen adi
+    ///   ExpiresAt      (DateTime?) → Son kullanma zamani; bos ise suresiz
+    /// }
+    /// Response {
+    ///   Id             (Guid)      → Kayit Id'si
+    ///   TenantId       (Guid?)     → Anahtarin adina calistigi tenant; bos ise host
+    ///   OrganizationId (Guid?)     → Anahtarin adina calistigi organizasyon
+    ///   Name           (string)    → Anahtarin gorunen adi
+    ///   ExpiresAt      (DateTime?) → Son kullanma zamani; bos ise suresiz
+    ///   CreationTime   (DateTime)  → Olusturulma zamani
+    ///   Key            (string)    → Ham anahtar degeri
+    /// }
+    /// Ham anahtar yalniz bu cevapta bir kez gosterilir, sonra okunamaz; saklanmasi cagiranin sorumlulugundadir.
+    /// Anahtar degerini sunucu uretir ve yalnizca bu cevapta doner; saklanmasi cagiranin sorumlulugundadir.
+    /// Tenant ve organizasyon alanlari istekten gelir; anahtarin hangi kapsam adina calisacagini cagiran belirler.
+    /// </remarks>
     [HttpPost]
+    [Authorize(CoreExtensionsPermissions.ApiKeys.Manage)]
     public virtual async Task<Result<CreatedApiKeyDto>> CreateAsync(
         [FromBody] CreateApiKeyDto input,
         CancellationToken cancellationToken = default)

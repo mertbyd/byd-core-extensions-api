@@ -24,11 +24,17 @@ public class CurrentOrganization(ICurrentOrganizationAccessor accessor)
     // Kapsamdaki organizasyonun adi; kapsam ad tasimiyorsa null.
     public string? Name => accessor.Current?.Name;
 
+    // Kapsamdaki organizasyonun ust organizasyon kimligi; kok organizasyonsa veya ust kayit yoksa null.
+    public Guid? ParentId => accessor.Current?.ParentId;
+
+    // Kapsamdaki organizasyonun ust organizasyon adi; kok organizasyonsa veya ust kayit yoksa null.
+    public string? ParentName => accessor.Current?.ParentName;
+
     // Verilen kapsami blok suresince yururluge koyar; blok bitince onceki kapsam geri doner.
-    public IDisposable Change(Guid? id, string? name = null)
+    public IDisposable Change(Guid? id, string? name = null, Guid? parentId = null, string? parentName = null)
     {
         var previous = accessor.Current;
-        accessor.Current = new BasicOrganizationInfo(id, name);
+        accessor.Current = new BasicOrganizationInfo(id, name, parentId, parentName);
         return new DisposeAction(() => accessor.Current = previous);
     }
 }

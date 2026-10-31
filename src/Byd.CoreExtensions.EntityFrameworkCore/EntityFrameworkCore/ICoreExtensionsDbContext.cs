@@ -2,6 +2,8 @@ using Volo.Abp.Data;
 using Volo.Abp.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Byd.CoreExtensions.Entities;
+using Byd.CoreExtensions.Entities.EmailEvents;
+using Byd.CoreExtensions.Entities.EmailTemplates;
 using Byd.CoreExtensions.Entities.EventBus;
 using Byd.CoreExtensions.Entities.ModuleSettings;
 
@@ -18,4 +20,8 @@ public interface ICoreExtensionsDbContext : IEfCoreDbContext
     DbSet<ApiKey> ApiKeys { get; }
 
     DbSet<FailedEventInbox> FailedEventInboxes { get; }
+
+    DbSet<EmailEvent> EmailEvents { get; }
+
+    DbSet<EmailTemplate> EmailTemplates { get; }
 }

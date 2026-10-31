@@ -12,7 +12,8 @@ namespace Byd.CoreExtensions.Organizations;
 /// <summary>
 /// Istegin organizasyon kapsamini token'daki claim'lerden kurar.
 /// </summary>
-// islevi: Kimlik dogrulanmissa organizasyon claim'lerini okur ve istegin kalanini o kapsamda yurutur.
+// islevi: Kimlik dogrulanmissa organizasyon ve ust organizasyon claim'lerini okur ve istegin kalanini o kapsamda
+// yurutur.
 // sistemdeki gorevi: Kapsamin istek yolundaki tek kurulma noktasi. ICurrentOrganization yalnizca okur; kapsami
 // buraya koymak, downstream kodun claim ayristirmasini tekrar etmesini ve her tuketicinin kendi kuralini
 // uydurmasini engeller.
@@ -33,9 +34,16 @@ public class OrganizationMiddleware(
             await next(context);
             return;
         }
+        // Ust organizasyon claim'i yalniz alt organizasyon seciminde gelir; yoksa kapsam kok organizasyondur.
+        Guid? parentId = Guid.TryParse(currentUser.FindClaimValue(OrganizationClaimTypes.ParentId), out var parsedParentId)
+            ? parsedParentId
+            : null;
+
         using (currentOrganization.Change(
                    organizationId,
-                   currentUser.FindClaimValue(OrganizationClaimTypes.OrganizationName)))
+                   currentUser.FindClaimValue(OrganizationClaimTypes.OrganizationName),
+                   parentId,
+                   currentUser.FindClaimValue(OrganizationClaimTypes.ParentName)))
         {
             await next(context);
         }

@@ -28,6 +28,15 @@ public static class DataTableFilterOperator
     // Metin alaninda gecme kontrolu; sembolu olmadigi icin kelime kullanilir.
     public const string Contains = "contains";
 
+    // Metin alaninda gecmeme kontrolu; Contains'in tersidir, bos alan da gecmiyor sayilir.
+    public const string NotContains = "notContains";
+
+    // Arama indeksinde kelime bazli tam metin eslesmesi; veritabani sorgusunda desteklenmez.
+    public const string Match = "match";
+
+    // Arama indeksinde yazim hatasina toleransli eslesme; veritabani sorgusunda desteklenmez.
+    public const string Fuzzy = "fuzzy";
+
     // Value ve SecondValue arasindaki kapali aralik; SecondValue'yu kullanan tek operator.
     public const string Between = "between";
 

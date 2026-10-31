@@ -2,10 +2,14 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Byd.AntiDuplicate.Middleware.Middleware;
 using Byd.CoreExtensions.ApiKeys;
+using Byd.CoreExtensions.Consts;
 using Byd.CoreExtensions.Data.ModuleSettings;
+using Byd.CoreExtensions.HealthChecks;
 using Byd.CoreExtensions.Organizations;
 using Byd.CoreExtensions.RateLimiting;
 using Volo.Abp.Data;
@@ -16,7 +20,7 @@ namespace Byd.CoreExtensions;
 /// <summary>
 /// Tuketen host'un modulu kendi pipeline'ina bagladigi ve modulun acilis isini tetikledigi uzanti.
 /// </summary>
-// islevi: Host'un beyanini isaretler, beyan edilen modul adina ait ayar satirini yazar ve bellek goruntulerini yukler.
+// islevi: Host'un beyanini isaretler, beyan edilen modul adina ait ayar satirini yazar, bellek goruntulerini yukler ve saglik ucunu acar.
 // sistemdeki gorevi: Modulun tuketen host'a actigi tek acilis kancasi. Modul adi CurrentModuleNameProvider uzerinden host'un Configure beyanindan cozulur; bu cagri yapilmazsa modul satiri hic yazilmaz ve modul acilista durur.
 public static class CoreExtensionsApplicationBuilderExtensions
 {
@@ -30,6 +34,9 @@ public static class CoreExtensionsApplicationBuilderExtensions
         // Pipeline kurulumu senkron oldugu icin acilis isi burada beklenir. Istek yolunda degil,
         // process basina bir kez calisan acilis adimi oldugu icin bloklama kabul edilir.
         InitializeAsync(app.ApplicationServices).GetAwaiter().GetResult();
+        // Saglik ucu kimlik ve kapsam gerektirmez; yoklama kaydi yoksa (host kapattiysa) uc acilmaz.
+        if (app.ApplicationServices.GetService<HealthCheckService>() is not null)
+            app.UseHealthChecks(HealthCheckConsts.Route, new HealthCheckOptions { ResponseWriter = HealthCheckResponseWriter.WriteAsync });
         // Kapsam once kurulur: altindaki her middleware ve endpoint ayni organizasyonu gorsun diye.
         app.UseMiddleware<OrganizationMiddleware>();
         app.UseMiddleware<BydAntiDuplicateMiddleware>();

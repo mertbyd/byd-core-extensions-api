@@ -14,4 +14,10 @@ public static class OrganizationClaimTypes
     // Organizasyonun okunabilir adi. Kapsamla birlikte tasinir cunku okuma aninda adi cozecek bir organizasyon
     // kaynagi yoktur; ada ihtiyaci olan kayit onu yazma aninda kendi icine gecirir.
     public const string OrganizationName = "organization_name";
+
+    // Alt organizasyon ise ust organizasyonun kimligi.
+    public const string ParentId = "parent_organization_id";
+
+    // Alt organizasyon ise ust organizasyonun okunabilir adi.
+    public const string ParentName = "parent_organization_name";
 }
